@@ -25,4 +25,14 @@ public class OdontologoServiceImpl implements IOdontologoService {
     public List<Odontologo> buscarTodosLosOdontologos() {
         return odontologoIDao.buscarTodos();
     }
+
+    @Override
+    public Odontologo buscarOdontologoPorId(int id) {
+        return odontologoIDao.buscarPorId(id);
+    }
+
+    @Override
+    public Odontologo actualizarOdontologo(Odontologo odontologo) {
+        return odontologoIDao.actualizar(odontologo);
+    }
 }
