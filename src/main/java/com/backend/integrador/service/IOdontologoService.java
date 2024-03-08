@@ -9,6 +9,7 @@ public interface IOdontologoService {
     Odontologo guardarOdontologo(Odontologo odontologo);
     List<Odontologo> buscarTodosLosOdontologos();
     Odontologo buscarOdontologoPorId(int id);
+    void eliminarOdontologo(int id);
 
     Odontologo actualizarOdontologo(Odontologo odontologo);
 }

@@ -32,6 +32,12 @@ public class OdontologoServiceImpl implements IOdontologoService {
     }
 
     @Override
+    public void eliminarOdontologo(int id) {
+        odontologoIDao.eliminarPorId(id);
+    }
+
+
+    @Override
     public Odontologo actualizarOdontologo(Odontologo odontologo) {
         return odontologoIDao.actualizar(odontologo);
     }

@@ -34,10 +34,12 @@ public class OdontologoController {
         return new ResponseEntity<>(odontologoService.guardarOdontologo(odontologo), HttpStatus.CREATED);
     }
 
-    /*@DeleteMapping("{id}")
-    public void eliminarOdontologo(@PathVariable int id) {
+    @DeleteMapping("{id}")
+    public HttpEntity<String> eliminarOdontologo(@PathVariable int id){
         odontologoService.eliminarOdontologo(id);
-    }*/
+        return new ResponseEntity<>("Se borro correctamente el odontologo", HttpStatus.NO_CONTENT);
+    }
+
 
     @PutMapping
     public Odontologo actualizarOdontologo(@RequestBody Odontologo odontologo) {

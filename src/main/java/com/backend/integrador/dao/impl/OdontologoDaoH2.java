@@ -6,7 +6,6 @@ import com.backend.integrador.entity.Odontologo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -181,6 +180,39 @@ public class OdontologoDaoH2 implements IDao<Odontologo> {
         }
 
         return odontologoActualizado;
+    }
+
+    @Override
+    public void eliminarPorId(int id) {
+        Connection connection = null;
+        try {
+            connection = H2Connection.getConnection();
+            connection.setAutoCommit(false);
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM ODONTOLOGOS WHERE id = ?");
+            preparedStatement.setInt(1, id);
+            preparedStatement.execute();
+            connection.commit();
+
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            if (existeLaConexion(connection)) {
+                try {
+                    connection.rollback();
+                    LOGGER.info("Se hizo rollback de la transaccion ya que hubo un error al borrar el odontologo");
+                } catch (SQLException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            }
+        } finally {
+            if (existeLaConexion(connection)) {
+                try {
+                    connection.close();
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+        }
     }
 
     private boolean existeLaConexion(Connection connection) {

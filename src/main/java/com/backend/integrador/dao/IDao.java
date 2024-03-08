@@ -7,4 +7,5 @@ public interface IDao <T>{
     List<T> buscarTodos();
     T buscarPorId(int id);
     T actualizar(T t);
+    void eliminarPorId(int id);
 }
