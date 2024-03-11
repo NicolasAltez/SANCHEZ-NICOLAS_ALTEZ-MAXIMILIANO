@@ -8,7 +8,6 @@ public class Paciente {
     private String nombre;
     private String apellido;
     private int dni;
-
     private LocalDate fechaIngreso;
     private Domicilio domicilio;
 
@@ -28,6 +27,7 @@ public class Paciente {
         this.fechaIngreso = fechaIngreso;
         this.domicilio = domicilio;
     }
+
 
     public int getId() {
         return id;
