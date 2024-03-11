@@ -29,12 +29,15 @@ public class PacienteDaoH2 implements IDao<Paciente> {
             connection = H2Connection.getConnection();
             connection.setAutoCommit(false);
 
+            DomicilioDaoH2 domicilioDaoH2 = new DomicilioDaoH2();
+            Domicilio domicilioRegistrado = domicilioDaoH2.guardar(paciente.getDomicilio());
+
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO PACIENTES (nombre, apellido, dni, fechaIngreso, domicilio) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, paciente.getNombre());
             preparedStatement.setString(2, paciente.getApellido());
             preparedStatement.setInt(3, paciente.getDni());
-            preparedStatement.setString(4, paciente.getFechaIngreso());//del local date
-            preparedStatement.setInt(5, paciente.getDomicilio());//seria el id de la tabla domicilio
+            preparedStatement.setDate(4, Date.valueOf(paciente.getFechaIngreso()));
+            preparedStatement.setInt(5, domicilioRegistrado.getId());
 
             preparedStatement.execute();
 
@@ -42,7 +45,7 @@ public class PacienteDaoH2 implements IDao<Paciente> {
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
             while (resultSet.next()) {
-                pacienteRegistrado = crearPaciente(resultSet);// ver si queda bien
+                pacienteRegistrado = crearPaciente(resultSet);
             }
 
             connection.commit();
@@ -124,12 +127,16 @@ public class PacienteDaoH2 implements IDao<Paciente> {
             connection = H2Connection.getConnection();
             connection.setAutoCommit(false);
 
+            DomicilioDaoH2 domicilioDaoH2 = new DomicilioDaoH2();
+
+            Domicilio domicilioActualizado = domicilioDaoH2.actualizar(paciente.getDomicilio());
+
             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE PACIENTES SET nombre = ?, apellido = ?, dni = ?, fechaIngreso = ?, domicilio = ? WHERE ID = ?");
             preparedStatement.setString(1, paciente.getNombre());
             preparedStatement.setString(2, paciente.getApellido());
             preparedStatement.setInt(3, paciente.getDni());
-            preparedStatement.setString(4, paciente.getFechaIngreso());//del local date
-            preparedStatement.setInt(5, paciente.getDomicilio());//seria el id de la tabla domicilio
+            preparedStatement.setDate(4, Date.valueOf(paciente.getFechaIngreso()));
+            preparedStatement.setInt(5, domicilioActualizado.getId());
 
             int rowsUpdated = preparedStatement.executeUpdate();
 
@@ -200,6 +207,7 @@ public class PacienteDaoH2 implements IDao<Paciente> {
     }
 
     private Paciente crearPaciente(ResultSet resultSet) throws SQLException {
-        return new Paciente(resultSet.getInt("id"), resultSet.getString("nombre"), resultSet.getString("apellido"), resultSet.getInt("dni"), resultSet.getLocalDate("fechaIngreso"), resultSet.getDomicilio("domicilio"));
+        Domicilio domicilio = new DomicilioDaoH2().buscarPorId(resultSet.getInt("domicilio_id"));
+        return new Paciente(resultSet.getInt("id"), resultSet.getString("nombre"), resultSet.getString("apellido"), resultSet.getInt("dni"), resultSet.getDate("fechaIngreso").toLocalDate(), domicilio);
     }
 }
