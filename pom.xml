@@ -67,7 +67,7 @@
 			<artifactId>logback-classic</artifactId>
 		</dependency>
 
-		<!--Dependencie Bean validations-->
+		<!--Dependency Bean validations-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
