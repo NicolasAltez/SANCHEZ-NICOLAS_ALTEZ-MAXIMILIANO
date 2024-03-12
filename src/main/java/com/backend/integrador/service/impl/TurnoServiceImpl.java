@@ -31,8 +31,8 @@ public class TurnoServiceImpl implements ITurnoService {
 
     @Override
     public TurnoSalidaDTO registrarTurno(TurnoEntradaDTO turnoEntradaDTO) throws OdontologoNoEncontradoException, PacienteNoEncontradoException {
-        PacienteSalidaDTO pacienteSalidaDTO = buscarPaciente(turnoEntradaDTO.getPacienteId());
-        OdontologoSalidaDTO odontologoSalidaDTO = buscarOdontologo(turnoEntradaDTO.getOdontologoId());
+        PacienteSalidaDTO pacienteSalidaDTO = pacienteService.buscarPacientePorId(turnoEntradaDTO.getPacienteId());
+        OdontologoSalidaDTO odontologoSalidaDTO =  odontologoService.buscarOdontologoPorId(turnoEntradaDTO.getOdontologoId());
 
         if (pacienteSalidaDTO == null) {
             throw new PacienteNoEncontradoException("No se encontró el paciente con id: " + turnoEntradaDTO.getPacienteId());
@@ -70,19 +70,4 @@ public class TurnoServiceImpl implements ITurnoService {
         return null; //TODO implementar
     }
 
-    private PacienteSalidaDTO buscarPaciente(int pacienteId) throws PacienteNoEncontradoException {
-        try {
-            return pacienteService.buscarPacientePorId(pacienteId);
-        } catch (Exception e) {
-            throw new PacienteNoEncontradoException("Ocurrio un error al buscar el paciente con id: " + pacienteId, e);
-        }
-    }
-
-    private OdontologoSalidaDTO buscarOdontologo(int odontologoId) throws OdontologoNoEncontradoException {
-        try {
-            return odontologoService.buscarOdontologoPorId(odontologoId);
-        } catch (Exception e) {
-            throw new OdontologoNoEncontradoException("Ocurrio un error al buscar el odontologo con id: " + odontologoId, e);
-        }
-    }
 }
