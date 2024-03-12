@@ -5,7 +5,7 @@ import com.backend.integrador.dto.paciente.PacienteEntradaDTO;
 import com.backend.integrador.dto.paciente.PacienteSalidaDTO;
 import com.backend.integrador.entity.Paciente;
 import com.backend.integrador.service.IPacienteService;
-import com.backend.integrador.utils.gson.JsonPrinter;
+import com.backend.integrador.utils.JsonPrinter;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class PacienteServiceImpl implements IPacienteService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(PacienteServiceImpl.class);
 
-    private final IDao<Paciente> pacienteIDao;
+    private IDao<Paciente> pacienteIDao;
 
     private ModelMapper modelMapper;
 

@@ -1,4 +1,4 @@
-package com.backend.integrador.utils.gson;
+package com.backend.integrador.config.gsonConfig;
 
 import com.google.gson.*;
 
