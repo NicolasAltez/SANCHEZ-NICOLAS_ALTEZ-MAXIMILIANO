@@ -1,7 +1,10 @@
 package com.backend.integrador.controller;
 
+import com.backend.integrador.dto.odontologo.OdontologoEntradaDTO;
+import com.backend.integrador.dto.odontologo.OdontologoSalidaDTO;
 import com.backend.integrador.entity.Odontologo;
 import com.backend.integrador.service.IOdontologoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +23,17 @@ public class OdontologoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Odontologo> buscarOdontologoPorId(@PathVariable int id) {
+    public ResponseEntity<OdontologoSalidaDTO> buscarOdontologoPorId(@PathVariable int id) {
         return new ResponseEntity<>(odontologoService.buscarOdontologoPorId(id), HttpStatus.OK);
     }
 
     @GetMapping
-    public HttpEntity<List<Odontologo>> buscarTodosLosOdontologos() {
+    public HttpEntity<List<OdontologoSalidaDTO>> buscarTodosLosOdontologos() {
         return new ResponseEntity<>(odontologoService.buscarTodosLosOdontologos(), HttpStatus.OK);
     }
 
     @PostMapping
-    public HttpEntity<Odontologo> guardarOdontologo(@RequestBody Odontologo odontologo) {
+    public HttpEntity<OdontologoSalidaDTO> guardarOdontologo(@RequestBody @Valid OdontologoEntradaDTO odontologo) {
         return new ResponseEntity<>(odontologoService.guardarOdontologo(odontologo), HttpStatus.CREATED);
     }
 
@@ -42,8 +45,8 @@ public class OdontologoController {
 
 
     @PutMapping
-    public Odontologo actualizarOdontologo(@RequestBody Odontologo odontologo) {
-        return odontologoService.actualizarOdontologo(odontologo);
+    public ResponseEntity<OdontologoSalidaDTO> actualizarOdontologo(@RequestBody @Valid OdontologoEntradaDTO odontologo) {
+        return new ResponseEntity<>(odontologoService.actualizarOdontologo(odontologo), HttpStatus.OK);
     }
 
 }

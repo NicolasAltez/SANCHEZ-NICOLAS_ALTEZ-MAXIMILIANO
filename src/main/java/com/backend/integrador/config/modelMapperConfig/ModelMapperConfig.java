@@ -1,4 +1,4 @@
-package com.backend.integrador.config;
+package com.backend.integrador.config.modelMapperConfig;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
