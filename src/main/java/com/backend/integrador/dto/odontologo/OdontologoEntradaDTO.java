@@ -1,8 +1,6 @@
 package com.backend.integrador.dto.odontologo;
 
-//import com.backend.integrador.dto.domicilio.DomicilioEntradaDTO;
-//import com.fasterxml.jackson.annotation.JsonFormat;
-//import jakarta.validation.Valid;
+
 import jakarta.validation.constraints.*;
 
 public class OdontologoEntradaDTO {
