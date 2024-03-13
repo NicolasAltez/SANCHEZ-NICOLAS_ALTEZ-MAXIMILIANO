@@ -1,17 +1,30 @@
 package com.backend.integrador.entity;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
-
+@Entity
+@Table(name = "pacientes")
 public class Paciente {
-
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false, length = 50)
     private String nombre;
+    @Column(nullable = false, length = 50)
     private String apellido;
+    @Column(nullable = false, length = 8,unique = true)
     private int dni;
+    @Column(name = "FECHA_INGRESO",nullable = false)
     private LocalDate fechaIngreso;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "domicilio_id", referencedColumnName = "id")
     private Domicilio domicilio;
 
-    public Paciente(int id, String nombre, String apellido, int dni, LocalDate fechaIngreso, Domicilio domicilio) {
+    public Paciente() {
+    }
+    public Paciente(Long id, String nombre, String apellido, int dni, LocalDate fechaIngreso, Domicilio domicilio) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -20,20 +33,11 @@ public class Paciente {
         this.domicilio = domicilio;
     }
 
-    public Paciente(String nombre, String apellido, int dni, LocalDate fechaIngreso, Domicilio domicilio) {
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.dni = dni;
-        this.fechaIngreso = fechaIngreso;
-        this.domicilio = domicilio;
-    }
-
-
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

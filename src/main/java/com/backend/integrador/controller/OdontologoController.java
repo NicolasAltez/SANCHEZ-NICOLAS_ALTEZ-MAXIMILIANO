@@ -2,7 +2,6 @@ package com.backend.integrador.controller;
 
 import com.backend.integrador.dto.odontologo.OdontologoEntradaDTO;
 import com.backend.integrador.dto.odontologo.OdontologoSalidaDTO;
-import com.backend.integrador.entity.Odontologo;
 import com.backend.integrador.service.IOdontologoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpEntity;

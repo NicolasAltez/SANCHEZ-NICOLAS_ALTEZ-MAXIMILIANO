@@ -1,13 +1,11 @@
 package com.backend.integrador.dto.domicilio;
 
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 
 public class DomicilioEntradaDTO {
     @NotNull(message = "El campo calle no puede ser nulo")
     @NotBlank(message = "El campo calle no puede estar en blanco")
+    @Size(min = 3, max = 255, message = "La calle debe tener entre 3 y 255 caracteres")
     private String calle;
 
     @Positive(message = "El numero no puede ser nulo o menor a cero")
@@ -16,10 +14,12 @@ public class DomicilioEntradaDTO {
 
     @NotNull(message = "El campo localidad no puede ser nulo")
     @NotBlank(message = "El campo localidad no puede estar en blanco")
+    @Size(min = 2, max = 255, message = "La localidad debe tener entre 2 y 255 caracteres")
     private String localidad;
 
     @NotNull(message = "El campo provincia no puede ser nulo")
     @NotBlank(message = "El campo provincia no puede estar en blanco")
+    @Size(min = 2, max = 255, message = "La provincia debe tener entre 2 y 255 caracteres")
     private String provincia;
 
     public DomicilioEntradaDTO() {

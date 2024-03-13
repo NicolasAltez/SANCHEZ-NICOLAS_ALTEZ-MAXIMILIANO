@@ -1,11 +1,15 @@
 package com.backend.integrador.dto.turno;
 
+
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 
 public class TurnoEntradaDTO {
     private int odontologoId;
     private int pacienteId;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime fechaYHora;
 
     public TurnoEntradaDTO() {
