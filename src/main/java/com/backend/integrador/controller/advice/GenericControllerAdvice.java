@@ -1,39 +1,46 @@
 package com.backend.integrador.controller.advice;
 
+import com.backend.integrador.dto.error.ErrorRespuestaDTO;
 import com.backend.integrador.exception.OdontologoNoEncontradoException;
 import com.backend.integrador.exception.PacienteNoEncontradoException;
 import com.backend.integrador.utils.DateUtils;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import java.util.HashMap;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.springframework.validation.FieldError;
+
+import static java.time.ZoneOffset.UTC;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
-public class GenericControllerAdvice {
+public class GenericControllerAdvice extends ResponseEntityExceptionHandler {
 
     private final Logger LOGGER = LoggerFactory.getLogger(GenericControllerAdvice.class);
-    private static final String MESSAGE = "message";
-    private static final String TIMESTAMP = "timestamp";
-    private static final String STATUS = "status";
-
 
     @ExceptionHandler(OdontologoNoEncontradoException.class)
     public ResponseEntity<Object> odontologoNoEncontradoException(OdontologoNoEncontradoException odontologoNoEncontradoException){
         String messageException = odontologoNoEncontradoException.getMessage();
 
-        Map<String,Object> respuesta = Map.of(
-                MESSAGE, messageException,
-                TIMESTAMP, DateUtils.obtenerFechaHoraActualFormateada(),
-                STATUS, HttpStatus.BAD_REQUEST
-        );
+        ErrorRespuestaDTO respuesta = new ErrorRespuestaDTO(
+                messageException,
+                DateUtils.obtenerFechaHoraActualFormateada(),
+                HttpStatus.BAD_REQUEST);
 
         LOGGER.error("OdontologoNoEncontradoException: {}", messageException);
         return new ResponseEntity<>(respuesta, HttpStatus.BAD_REQUEST);
@@ -43,32 +50,31 @@ public class GenericControllerAdvice {
     public ResponseEntity<Object> pacienteNoEncontradoException(PacienteNoEncontradoException pacienteNoEncontradoException){
         String messageException = pacienteNoEncontradoException.getMessage();
 
-        Map<String,Object> respuesta = Map.of(
-                MESSAGE, messageException,
-                TIMESTAMP, DateUtils.obtenerFechaHoraActualFormateada(),
-                STATUS, HttpStatus.BAD_REQUEST
-        );
+        ErrorRespuestaDTO respuesta = new ErrorRespuestaDTO(
+                messageException,
+                DateUtils.obtenerFechaHoraActualFormateada(),
+                HttpStatus.BAD_REQUEST);
 
         LOGGER.error("PacienteNoEncontradoException: {}", messageException);
         return new ResponseEntity<>(respuesta, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> validacionErroresDTOs(MethodArgumentNotValidException ex) {
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        List<String> errores = ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.toList());
 
-        Map<String, String> errores = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errores.put(error.getField(), error.getDefaultMessage()));
+        Map<String, Object> responseBody = Map.of(
+                "message", "Validación fallida",
+                "errores", errores,
+                "timestamp", LocalDateTime.now(UTC),
+                "status", HttpStatus.BAD_REQUEST
 
-        Map<String, Object> respuesta = Map.of(
-                MESSAGE, "Validación fallida",
-                TIMESTAMP, DateUtils.obtenerFechaHoraActualFormateada(),
-                STATUS, HttpStatus.BAD_REQUEST.value(),
-                "errores", errores
         );
-
-        LOGGER.error("MethodArgumentNotValidException: {}", errores);
-        return new ResponseEntity<>(respuesta, HttpStatus.BAD_REQUEST);
+        LOGGER.error("error trying validate request body: ", ex);
+        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
 }

@@ -1,30 +1,35 @@
 package com.backend.integrador.entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "odontologos")
 public class Odontologo {
-
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false, length = 50, unique = true)
     private String numeroDeMatricula;
+    @Column(nullable = false, length = 50)
     private String nombre;
+    @Column(nullable = false, length = 50)
     private String apellido;
+    public Odontologo() {
+    }
 
-    public Odontologo(int id, String numeroDeMatricula, String nombre, String apellido) {
+    public Odontologo(Long id, String numeroDeMatricula, String nombre, String apellido) {
         this.id = id;
         this.numeroDeMatricula = numeroDeMatricula;
         this.nombre = nombre;
         this.apellido = apellido;
     }
 
-    public Odontologo(String numeroDeMatricula, String nombre, String apellido) {
-        this.numeroDeMatricula = numeroDeMatricula;
-        this.nombre = nombre;
-        this.apellido = apellido;
-    }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

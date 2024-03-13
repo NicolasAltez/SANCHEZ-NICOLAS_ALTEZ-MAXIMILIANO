@@ -1,14 +1,23 @@
 package com.backend.integrador.entity;
 
-public class Domicilio {
+import jakarta.persistence.*;
 
-    private int id;
+@Entity
+@Table(name = "domicilios")
+public class Domicilio {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false)
     private String calle;
+    @Column(nullable = false)
     private int numero;
+    @Column(nullable = false)
     private String localidad;
+    @Column(nullable = false)
     private String provincia;
 
-    public Domicilio(int id, String calle, int numero, String localidad, String provincia) {
+    public Domicilio(Long id, String calle, int numero, String localidad, String provincia) {
         this.id = id;
         this.calle = calle;
         this.numero = numero;
@@ -16,18 +25,11 @@ public class Domicilio {
         this.provincia = provincia;
     }
 
-    public Domicilio(String calle, int numero, String localidad, String provincia) {
-        this.calle = calle;
-        this.numero = numero;
-        this.localidad = localidad;
-        this.provincia = provincia;
-    }
-
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

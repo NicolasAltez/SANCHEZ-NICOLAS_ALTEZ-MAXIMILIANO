@@ -5,64 +5,83 @@ import com.backend.integrador.dto.odontologo.OdontologoSalidaDTO;
 import com.backend.integrador.dto.paciente.PacienteSalidaDTO;
 import com.backend.integrador.dto.turno.TurnoEntradaDTO;
 import com.backend.integrador.dto.turno.TurnoSalidaDTO;
+import com.backend.integrador.entity.Odontologo;
+import com.backend.integrador.entity.Paciente;
+import com.backend.integrador.entity.Turno;
 import com.backend.integrador.exception.OdontologoNoEncontradoException;
 import com.backend.integrador.exception.PacienteNoEncontradoException;
+import com.backend.integrador.repository.OdontologoRepository;
+import com.backend.integrador.repository.PacienteRepository;
+import com.backend.integrador.repository.TurnoRepository;
 import com.backend.integrador.service.IOdontologoService;
 import com.backend.integrador.service.IPacienteService;
 import com.backend.integrador.service.ITurnoService;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TurnoServiceImpl implements ITurnoService {
     private final Logger LOGGER = LoggerFactory.getLogger(TurnoServiceImpl.class);
-    private final IPacienteService pacienteService;
-    private final IOdontologoService odontologoService;
+    private ModelMapper modelMapper;
+    private  TurnoRepository turnoRepository;
+    private PacienteRepository pacienteRepository;
+    private OdontologoRepository odontologoRepository;
 
-    public TurnoServiceImpl(IPacienteService pacienteService, IOdontologoService odontologoService) {
-        this.pacienteService = pacienteService;
-        this.odontologoService = odontologoService;
+    public TurnoServiceImpl(PacienteRepository pacienteRepository, OdontologoRepository odontologoRepository, TurnoRepository turnoRepository,ModelMapper modelMapper) {
+        this.pacienteRepository = pacienteRepository;
+        this.odontologoRepository = odontologoRepository;
+        this.modelMapper = modelMapper;
+        this.turnoRepository = turnoRepository;
     }
 
     @Override
     public TurnoSalidaDTO registrarTurno(TurnoEntradaDTO turnoEntradaDTO) throws OdontologoNoEncontradoException, PacienteNoEncontradoException {
-        PacienteSalidaDTO pacienteSalidaDTO = pacienteService.buscarPacientePorId(turnoEntradaDTO.getPacienteId());
-        OdontologoSalidaDTO odontologoSalidaDTO =  odontologoService.buscarOdontologoPorId(turnoEntradaDTO.getOdontologoId());
+        Paciente paciente = pacienteRepository.findById(turnoEntradaDTO.getPacienteId()).orElseThrow(
+                () -> new PacienteNoEncontradoException("No se encontró el paciente con id: " + turnoEntradaDTO.getPacienteId())
+        );
 
-        if (pacienteSalidaDTO == null) {
-            throw new PacienteNoEncontradoException("No se encontró el paciente con id: " + turnoEntradaDTO.getPacienteId());
-        }
+        Odontologo odontologo = odontologoRepository.findById(turnoEntradaDTO.getOdontologoId()).orElseThrow(
+                () -> new OdontologoNoEncontradoException("No se encontró el odontologo con id: " + turnoEntradaDTO.getOdontologoId())
+        );
 
-        if (odontologoSalidaDTO == null) {
-            throw new OdontologoNoEncontradoException("No se encontró el odontologo con id: " + turnoEntradaDTO.getOdontologoId());
-        }
+        LOGGER.info("Registrando turno para el paciente: {} y el odontologo: {}", paciente, odontologo);
 
-        LOGGER.info("Registrando turno para el paciente: {} y el odontologo: {}", pacienteSalidaDTO, odontologoSalidaDTO);
-        return new TurnoSalidaDTO(1, odontologoSalidaDTO, pacienteSalidaDTO, LocalDateTime.now());
+        Turno turnoGuardado = turnoRepository.save(modelMapper.map(turnoEntradaDTO, Turno.class));
+
+        return modelMapper.map(turnoGuardado, TurnoSalidaDTO.class);
     }
 
     @Override
     public List<TurnoSalidaDTO> listarTurnos() {
-        DomicilioSalidaDTO domicilioSalidaDTO = new DomicilioSalidaDTO(1, "calle", 123, "localidad", "provincia");
-        PacienteSalidaDTO pacienteSalidaDTO = new PacienteSalidaDTO(1, "maximiliano", "altez", 12312, LocalDate.now(), domicilioSalidaDTO);
-        OdontologoSalidaDTO odontologoSalidaDTO = new OdontologoSalidaDTO(1, "matricula", "nicolas", "sanchez");
-        TurnoSalidaDTO turnoSalidaDTO = new TurnoSalidaDTO(1, odontologoSalidaDTO, pacienteSalidaDTO, LocalDateTime.now());
-        return List.of(turnoSalidaDTO);
+        return turnoRepository.findAll()
+                .stream()
+                .map(turno -> modelMapper.map(turno, TurnoSalidaDTO.class))
+                .toList();
     }
 
     @Override
     public TurnoSalidaDTO buscarTurnoPorId(int id) {
-        return null; //TODO implementar
+        return turnoRepository.findById(id).map(turno -> modelMapper.map(turno, TurnoSalidaDTO.class))
+                .orElseGet(() -> {
+                    LOGGER.info("No se encontró el turno con id: {}", id);
+                    return null;
+                });
     }
 
     @Override
     public void eliminarTurno(int id) {
-        //TODO implementar
+        turnoRepository.findById(id).ifPresentOrElse(
+                turnoRepository::delete,
+                () -> LOGGER.info("No se encontró el turno a eliminar con id: {}", id)
+        );
     }
 
     @Override
