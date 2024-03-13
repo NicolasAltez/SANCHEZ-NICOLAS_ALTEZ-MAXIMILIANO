@@ -68,7 +68,7 @@ public class TurnoServiceImpl implements ITurnoService {
     }
 
     @Override
-    public TurnoSalidaDTO buscarTurnoPorId(int id) {
+    public TurnoSalidaDTO buscarTurnoPorId(Long id) {
         return turnoRepository.findById(id).map(turno -> modelMapper.map(turno, TurnoSalidaDTO.class))
                 .orElseGet(() -> {
                     LOGGER.info("No se encontró el turno con id: {}", id);
@@ -77,7 +77,7 @@ public class TurnoServiceImpl implements ITurnoService {
     }
 
     @Override
-    public void eliminarTurno(int id) {
+    public void eliminarTurno(Long id) {
         turnoRepository.findById(id).ifPresentOrElse(
                 turnoRepository::delete,
                 () -> LOGGER.info("No se encontró el turno a eliminar con id: {}", id)

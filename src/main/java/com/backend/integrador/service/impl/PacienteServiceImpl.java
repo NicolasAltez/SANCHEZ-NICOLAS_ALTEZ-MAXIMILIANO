@@ -46,7 +46,7 @@ public class PacienteServiceImpl implements IPacienteService {
     }
 
     @Override
-    public PacienteSalidaDTO buscarPacientePorId(int id) {
+    public PacienteSalidaDTO buscarPacientePorId(Long id) {
         return pacienteRepository.findById(id).map(paciente -> modelMapper.map(paciente,PacienteSalidaDTO.class
         )).orElseGet(() -> {
             LOGGER.info("No se encontró el paciente con id: {}", id);
@@ -68,7 +68,7 @@ public class PacienteServiceImpl implements IPacienteService {
     }
 
     @Override
-    public void eliminarPaciente(int id) {
+    public void eliminarPaciente(Long id) {
         pacienteRepository.findById(id).ifPresentOrElse(
                 pacienteRepository::delete,
                 () -> LOGGER.info("No se encontró el paciente a eliminar con id: {}", id)

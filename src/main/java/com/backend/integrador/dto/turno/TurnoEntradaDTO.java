@@ -5,35 +5,36 @@ package com.backend.integrador.dto.turno;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.LongAccumulator;
 
 public class TurnoEntradaDTO {
-    private int odontologoId;
-    private int pacienteId;
+    private Long odontologoId;
+    private Long pacienteId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime fechaYHora;
 
     public TurnoEntradaDTO() {
     }
 
-    public TurnoEntradaDTO(int odontologoId, int pacienteId, LocalDateTime fechaYHora) {
+    public TurnoEntradaDTO(Long odontologoId, Long pacienteId, LocalDateTime fechaYHora) {
         this.odontologoId = odontologoId;
         this.pacienteId = pacienteId;
         this.fechaYHora = fechaYHora;
     }
 
-    public int getOdontologoId() {
+    public Long getOdontologoId() {
         return odontologoId;
     }
 
-    public void setOdontologoId(int odontologoId) {
+    public void setOdontologoId(Long odontologoId) {
         this.odontologoId = odontologoId;
     }
 
-    public int getPacienteId() {
+    public Long getPacienteId() {
         return pacienteId;
     }
 
-    public void setPacienteId(int pacienteId) {
+    public void setPacienteId(Long pacienteId) {
         this.pacienteId = pacienteId;
     }
 

@@ -45,7 +45,7 @@ public class OdontologoServiceImpl implements IOdontologoService {
     }
 
     @Override
-    public OdontologoSalidaDTO buscarOdontologoPorId(int id) {
+    public OdontologoSalidaDTO buscarOdontologoPorId(Long id) {
         return odontologoRepository.findById(id).map(odontologo -> modelMapper.map(odontologo, OdontologoSalidaDTO.class))
                 .orElseGet(() -> {
                     LOGGER.info("No se encontró el odontologo con id: {}", id);
@@ -54,7 +54,7 @@ public class OdontologoServiceImpl implements IOdontologoService {
     }
 
     @Override
-    public void eliminarOdontologo(int id) {
+    public void eliminarOdontologo(Long id) {
        odontologoRepository.findById(id).ifPresentOrElse(
                odontologoRepository::delete,
                () -> LOGGER.info("No se encontró el odontologo a eliminar con id: {}", id)
@@ -64,11 +64,11 @@ public class OdontologoServiceImpl implements IOdontologoService {
 
     @Override
     public OdontologoSalidaDTO actualizarOdontologo(OdontologoEntradaDTO odontologo) {
-        Optional<Odontologo> odontologoAActualizar = odontologoRepository.findByNumeroDeMatricula(odontologo.getNumeroMatricula());
+        Optional<Odontologo> odontologoAActualizar = odontologoRepository.findByNumeroDeMatricula(odontologo.getNumeroDeMatricula());
         if (odontologoAActualizar.isPresent()){
             return modelMapper.map(odontologoAActualizar, OdontologoSalidaDTO.class);
         } else {
-            LOGGER.info("No se encontró el odontologo a actualizar con matricula: {}", odontologo.getNumeroMatricula());
+            LOGGER.info("No se encontró el odontologo a actualizar con matricula: {}", odontologo.getNumeroDeMatricula());
             return null;
         }
     }

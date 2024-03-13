@@ -8,7 +8,7 @@ public class OdontologoEntradaDTO {
     @NotNull(message = "El numero de matricula del odontologo no puede ser nulo")
     @NotBlank(message = "El numero de matricula del odontologo no puede estar vacío")
     @Size(min = 2, max = 50, message = "El numero de matricula del odontologo debe tener entre 3 y 50 caracteres")
-    private String numeroMatricula;
+    private String numeroDeMatricula;
 
     @NotNull(message = "El nombre del odontologo no puede ser nulo")
     @NotBlank(message = "El nombre del odontologo no puede estar vacío")
@@ -25,18 +25,18 @@ public class OdontologoEntradaDTO {
 
     }
 
-    public OdontologoEntradaDTO(String numeroMatricula, String nombre, String apellido) {
-        this.numeroMatricula=numeroMatricula;
+    public OdontologoEntradaDTO(String numeroDeMatricula, String nombre, String apellido) {
+        this.numeroDeMatricula = numeroDeMatricula;
         this.nombre = nombre;
         this.apellido = apellido;
     }
 
-    public String getNumeroMatricula() {
-        return numeroMatricula;
+    public String getNumeroDeMatricula() {
+        return numeroDeMatricula;
     }
 
-    public void setNumeroMatricula(String numeroMatricula) {
-        this.numeroMatricula = numeroMatricula;
+    public void setNumeroDeMatricula(String numeroDeMatricula) {
+        this.numeroDeMatricula = numeroDeMatricula;
     }
 
     public String getNombre() {

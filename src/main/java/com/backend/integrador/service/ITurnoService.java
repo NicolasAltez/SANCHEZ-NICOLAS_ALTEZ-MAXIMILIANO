@@ -12,9 +12,9 @@ public interface ITurnoService {
     TurnoSalidaDTO registrarTurno(TurnoEntradaDTO turnoEntradaDTO) throws OdontologoNoEncontradoException, PacienteNoEncontradoException;
     List<TurnoSalidaDTO> listarTurnos();
 
-    TurnoSalidaDTO buscarTurnoPorId(int id);
+    TurnoSalidaDTO buscarTurnoPorId(Long id);
 
-    void eliminarTurno(int id);
+    void eliminarTurno(Long id);
 
     TurnoSalidaDTO actualizarTurno(TurnoEntradaDTO turnoEntradaDTO);
 }

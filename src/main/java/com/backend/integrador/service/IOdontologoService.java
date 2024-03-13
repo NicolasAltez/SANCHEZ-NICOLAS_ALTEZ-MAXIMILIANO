@@ -10,8 +10,8 @@ public interface IOdontologoService {
 
     OdontologoSalidaDTO guardarOdontologo(OdontologoEntradaDTO odontologo);
     List<OdontologoSalidaDTO> buscarTodosLosOdontologos();
-    OdontologoSalidaDTO buscarOdontologoPorId(int id);
-    void eliminarOdontologo(int id);
+    OdontologoSalidaDTO buscarOdontologoPorId(Long id);
+    void eliminarOdontologo(Long id);
 
     OdontologoSalidaDTO actualizarOdontologo(OdontologoEntradaDTO odontologo);
 }
