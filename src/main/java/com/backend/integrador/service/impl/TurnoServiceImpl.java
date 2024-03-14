@@ -45,16 +45,22 @@ public class TurnoServiceImpl implements ITurnoService {
     @Override
     public TurnoSalidaDTO registrarTurno(TurnoEntradaDTO turnoEntradaDTO) throws OdontologoNoEncontradoException, PacienteNoEncontradoException {
         Paciente paciente = pacienteRepository.findById(turnoEntradaDTO.getPacienteId()).orElseThrow(
-                () -> new PacienteNoEncontradoException("No se encontró el paciente con id: " + turnoEntradaDTO.getPacienteId())
+                () -> new PacienteNoEncontradoException("No se encontró el paciente para agendar el turno con id: " + turnoEntradaDTO.getPacienteId())
         );
 
         Odontologo odontologo = odontologoRepository.findById(turnoEntradaDTO.getOdontologoId()).orElseThrow(
-                () -> new OdontologoNoEncontradoException("No se encontró el odontologo con id: " + turnoEntradaDTO.getOdontologoId())
+                () -> new OdontologoNoEncontradoException("No se encontró el odontologo para agendar el turno con id: " + turnoEntradaDTO.getOdontologoId())
         );
 
         LOGGER.info("Registrando turno para el paciente: {} y el odontologo: {}", paciente, odontologo);
 
-        Turno turnoGuardado = turnoRepository.save(modelMapper.map(turnoEntradaDTO, Turno.class));
+        Turno turnoAGuardar = new Turno();
+        turnoAGuardar.setOdontologo(odontologo);
+        turnoAGuardar.setPaciente(paciente);
+        turnoAGuardar.setFechaYHora(turnoEntradaDTO.getFechaYHora());
+
+        Turno turnoGuardado = turnoRepository.save(turnoAGuardar);
+
 
         return modelMapper.map(turnoGuardado, TurnoSalidaDTO.class);
     }

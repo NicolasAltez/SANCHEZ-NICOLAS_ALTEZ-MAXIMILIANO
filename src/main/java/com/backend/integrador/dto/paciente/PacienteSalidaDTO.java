@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 public class PacienteSalidaDTO {
 
-    private int id;
+    private Long id;
     private String nombre;
     private String apellido;
     private int dni;
@@ -16,7 +16,7 @@ public class PacienteSalidaDTO {
     public PacienteSalidaDTO() {
     }
 
-    public PacienteSalidaDTO(int id, String nombre, String apellido, int dni, LocalDate fechaIngreso, DomicilioSalidaDTO domicilioSalidaDTO) {
+    public PacienteSalidaDTO(Long id, String nombre, String apellido, int dni, LocalDate fechaIngreso, DomicilioSalidaDTO domicilioSalidaDTO) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -25,11 +25,11 @@ public class PacienteSalidaDTO {
         this.domicilioSalidaDTO = domicilioSalidaDTO;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

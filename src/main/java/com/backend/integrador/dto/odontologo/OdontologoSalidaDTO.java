@@ -2,35 +2,35 @@ package com.backend.integrador.dto.odontologo;
 
 public class OdontologoSalidaDTO {
 
-    private int id;
-    private String numeroMatricula;
+    private Long id;
+    private String numeroDeMatricula;
     private String nombre;
     private String apellido;
 
     public OdontologoSalidaDTO() {
     }
 
-    public OdontologoSalidaDTO(int id, String numeroMatricula, String nombre, String apellido) {
+    public OdontologoSalidaDTO(Long id, String numeroDeMatricula, String nombre, String apellido) {
         this.id = id;
-        this.numeroMatricula = numeroMatricula;
+        this.numeroDeMatricula = numeroDeMatricula;
         this.nombre = nombre;
         this.apellido = apellido;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getNumeroMatricula() {
-        return numeroMatricula;
+    public String getNumeroDeMatricula() {
+        return numeroDeMatricula;
     }
 
-    public void setNumeroMatricula(String numeroMatricula) {
-        this.numeroMatricula = numeroMatricula;
+    public void setNumeroDeMatricula(String numeroDeMatricula) {
+        this.numeroDeMatricula = numeroDeMatricula;
     }
 
     public String getNombre() {

@@ -7,7 +7,7 @@ import com.backend.integrador.dto.paciente.PacienteSalidaDTO;
 import java.time.LocalDateTime;
 
 public class TurnoSalidaDTO {
-    private int id;
+    private Long id;
     private OdontologoSalidaDTO odontologo;
     private PacienteSalidaDTO paciente;
     private LocalDateTime fechaYHora;
@@ -15,18 +15,18 @@ public class TurnoSalidaDTO {
     public TurnoSalidaDTO() {
     }
 
-    public TurnoSalidaDTO(int id, OdontologoSalidaDTO odontologo, PacienteSalidaDTO paciente, LocalDateTime fechaYHora) {
+    public TurnoSalidaDTO(Long id, OdontologoSalidaDTO odontologo, PacienteSalidaDTO paciente, LocalDateTime fechaYHora) {
         this.id = id;
         this.odontologo = odontologo;
         this.paciente = paciente;
         this.fechaYHora = fechaYHora;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

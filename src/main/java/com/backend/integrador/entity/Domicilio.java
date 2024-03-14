@@ -16,6 +16,8 @@ public class Domicilio {
     private String localidad;
     @Column(nullable = false)
     private String provincia;
+    public Domicilio() {
+    }
 
     public Domicilio(Long id, String calle, int numero, String localidad, String provincia) {
         this.id = id;
