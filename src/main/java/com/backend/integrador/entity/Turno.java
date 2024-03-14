@@ -10,11 +10,11 @@ public class Turno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "odontologo_id", referencedColumnName = "id")
     private Odontologo odontologo;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "paciente_id", referencedColumnName = "id")
     private Paciente paciente;
     private LocalDateTime fechaYHora;
