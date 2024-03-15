@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class Turno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     @ManyToOne
     @JoinColumn(name = "odontologo_id", referencedColumnName = "id")
     private Odontologo odontologo;
@@ -22,18 +22,24 @@ public class Turno {
     public Turno(){
     }
 
-    public Turno(int id, Odontologo odontologo, Paciente paciente, LocalDateTime fechaYHora) {
+    public Turno(Long id, Odontologo odontologo, Paciente paciente, LocalDateTime fechaYHora) {
         this.id = id;
         this.odontologo = odontologo;
         this.paciente = paciente;
         this.fechaYHora = fechaYHora;
     }
 
-    public int getId() {
+    public Turno(Odontologo odontologo, Paciente paciente, LocalDateTime fechaYHora) {
+        this.odontologo = odontologo;
+        this.paciente = paciente;
+        this.fechaYHora = fechaYHora;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

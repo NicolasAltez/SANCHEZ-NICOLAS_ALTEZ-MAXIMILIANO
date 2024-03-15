@@ -54,12 +54,7 @@ public class TurnoServiceImpl implements ITurnoService {
 
         LOGGER.info("Registrando turno para el paciente: {} y el odontologo: {}", paciente, odontologo);
 
-        Turno turnoAGuardar = new Turno();
-        turnoAGuardar.setOdontologo(odontologo);
-        turnoAGuardar.setPaciente(paciente);
-        turnoAGuardar.setFechaYHora(turnoEntradaDTO.getFechaYHora());
-
-        Turno turnoGuardado = turnoRepository.save(turnoAGuardar);
+        Turno turnoGuardado = turnoRepository.save(new Turno(odontologo, paciente, turnoEntradaDTO.getFechaYHora()));
 
 
         return modelMapper.map(turnoGuardado, TurnoSalidaDTO.class);
