@@ -4,9 +4,15 @@ import com.backend.integrador.dto.domicilio.DomicilioEntradaDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.*;
 
 import java.time.LocalDate;
 
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class PacienteEntradaDTO {
     @NotNull(message = "El nombre del paciente no puede ser nulo")
     @NotBlank(message = "El nombre del paciente no puede estar vacío")
@@ -29,55 +35,4 @@ public class PacienteEntradaDTO {
     @Valid
     private DomicilioEntradaDTO domicilioEntradaDTO;
 
-    public PacienteEntradaDTO(){
-
-    }
-
-    public PacienteEntradaDTO(String nombre, String apellido, int dni, LocalDate fechaIngreso, DomicilioEntradaDTO domicilio) {
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.dni = dni;
-        this.fechaIngreso = fechaIngreso;
-        this.domicilioEntradaDTO = domicilio;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public int getDni() {
-        return dni;
-    }
-
-    public void setDni(int dni) {
-        this.dni = dni;
-    }
-
-    public LocalDate getFechaIngreso() {
-        return fechaIngreso;
-    }
-
-    public void setFechaIngreso(LocalDate fechaIngreso) {
-        this.fechaIngreso = fechaIngreso;
-    }
-
-    public DomicilioEntradaDTO getDomicilioEntradaDTO() {
-        return domicilioEntradaDTO;
-    }
-
-    public void setDomicilioEntradaDTO(DomicilioEntradaDTO domicilioEntradaDTO) {
-        this.domicilioEntradaDTO = domicilioEntradaDTO;
-    }
 }
