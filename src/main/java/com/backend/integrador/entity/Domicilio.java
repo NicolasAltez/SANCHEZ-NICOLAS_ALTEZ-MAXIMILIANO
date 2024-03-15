@@ -3,7 +3,7 @@ package com.backend.integrador.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "domicilios")
+@Table(name = "DOMICILIOS")
 public class Domicilio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

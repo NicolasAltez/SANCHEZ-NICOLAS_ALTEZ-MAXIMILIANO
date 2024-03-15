@@ -5,18 +5,19 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 @Entity
-@Table(name = "turnos")
+@Table(name = "TURNOS")
 public class Turno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "odontologo_id", referencedColumnName = "id")
+    @JoinColumn(name = "ODONTOLOGO_ID", referencedColumnName = "ID")
     private Odontologo odontologo;
 
     @ManyToOne
-    @JoinColumn(name = "paciente_id", referencedColumnName = "id")
+    @JoinColumn(name = "PACIENTE_ID", referencedColumnName = "ID")
     private Paciente paciente;
+    @Column(name = "FECHA_Y_HORA", nullable = false)
     private LocalDateTime fechaYHora;
 
     public Turno(){

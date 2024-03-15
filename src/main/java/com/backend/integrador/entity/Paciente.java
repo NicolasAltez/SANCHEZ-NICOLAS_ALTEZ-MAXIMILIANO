@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 @Entity
-@Table(name = "pacientes")
+@Table(name = "PACIENTES")
 public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +19,7 @@ public class Paciente {
     private LocalDate fechaIngreso;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "domicilio_id", referencedColumnName = "id")
+    @JoinColumn(name = "DOMICILIO_ID", referencedColumnName = "ID")
     private Domicilio domicilio;
 
     public Paciente() {
