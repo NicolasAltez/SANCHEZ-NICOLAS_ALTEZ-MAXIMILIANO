@@ -14,5 +14,4 @@ public class ErrorRespuestaDTO {
     private String mensaje;
     private String timestamp;
     private HttpStatus status;
-
 }

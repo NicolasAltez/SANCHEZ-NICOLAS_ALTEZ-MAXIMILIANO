@@ -16,19 +16,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.validation.FieldError;
 
-import static java.time.ZoneOffset.UTC;
-
-@Order(Ordered.HIGHEST_PRECEDENCE)
-@ControllerAdvice
+@RestControllerAdvice
 public class GenericControllerAdvice extends ResponseEntityExceptionHandler {
 
     private final Logger LOGGER = LoggerFactory.getLogger(GenericControllerAdvice.class);
@@ -69,7 +66,7 @@ public class GenericControllerAdvice extends ResponseEntityExceptionHandler {
         Map<String, Object> responseBody = Map.of(
                 "message", "Validación fallida",
                 "errores", errores,
-                "timestamp", LocalDateTime.now(UTC),
+                "timestamp", DateUtils.obtenerFechaHoraActualFormateada(),
                 "status", HttpStatus.BAD_REQUEST
 
         );
