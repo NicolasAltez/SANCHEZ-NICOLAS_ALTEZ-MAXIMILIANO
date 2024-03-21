@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pacientes</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+<body>
+<nav class="navbar navbar-light bg-dark">
+    <span class="navbar-brand m-auto h1 text-white text-center p-4">PACIENTES</span>
+</nav>
+
+
+
+<div id="mensajes-pacientes" class="alert alert-success text-center" style="font-size: 20px;display:none;"></div>
+
+<div class="row justify-content-center">
+    <div id="paciente-detalle" class="text-center mt-5 p-2 col-md-4">
+
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-8- mt-5">
+            <table class="table table-bordered table-hover text-center">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Dni</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Calle</th>
+                    <th>Numero</th>
+                    <th>Localidad</th>
+                    <th>Provincia</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="tbody-pacientes">
+            </table>
+        </div>
+        <div class="col-4 ml-auto" style="margin-top: 50px">
+            <div class="ml-5">
+                <div class="form-group">
+                    <input type="text" class="form-control font-italic" id="nombre" placeholder="Nombre">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control font-italic" id="apellido" placeholder="Apellido">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control font-italic" id="dni" placeholder="Dni">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control font-italic" id="fecha-ingreso" placeholder="Fecha Ingreso">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control font-italic" id="calle" placeholder="Calle">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control font-italic" id="numero" placeholder="Numero">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control font-italic" id="localidad" placeholder="Localidad">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control font-italic" id="provincia" placeholder="Provincia">
+                </div>
+                <input type="hidden" id="idPaciente"/>
+                <button id="guardarPaciente" class="btn btn-success btn-block">Registrar Paciente</button>
+                <button id="actualizarPaciente" class="btn btn-primary btn-block" style="display: none">Actualizar Paciente</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="./js/pacientes.js"></script>
+</body>
+</html>
