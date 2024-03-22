@@ -2,6 +2,7 @@ package com.backend.integrador.controller;
 
 import com.backend.integrador.dto.paciente.PacienteEntradaDTO;
 import com.backend.integrador.dto.paciente.PacienteSalidaDTO;
+import com.backend.integrador.exception.ResourceNotFoundException;
 import com.backend.integrador.service.IPacienteService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpEntity;
@@ -35,7 +36,7 @@ public class PacienteController {
     }
 
     @DeleteMapping("{id}")
-    public HttpEntity<String> eliminarPaciente(@PathVariable Long id){
+    public HttpEntity<String> eliminarPaciente(@PathVariable Long id) throws ResourceNotFoundException {
         pacienteService.eliminarPaciente(id);
         return new ResponseEntity<>("Se borro correctamente el paciente", HttpStatus.NO_CONTENT);
     }

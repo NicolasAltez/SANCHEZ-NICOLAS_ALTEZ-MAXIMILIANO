@@ -3,6 +3,7 @@ package com.backend.integrador.service.impl;
 import com.backend.integrador.dto.paciente.PacienteEntradaDTO;
 import com.backend.integrador.dto.paciente.PacienteSalidaDTO;
 import com.backend.integrador.entity.Paciente;
+import com.backend.integrador.exception.ResourceNotFoundException;
 import com.backend.integrador.repository.PacienteRepository;
 import com.backend.integrador.service.IPacienteService;
 import com.backend.integrador.utils.JsonPrinter;
@@ -47,7 +48,7 @@ public class PacienteServiceImpl implements IPacienteService {
 
     @Override
     public PacienteSalidaDTO buscarPacientePorId(Long id) {
-        return pacienteRepository.findById(id).map(paciente -> modelMapper.map(paciente,PacienteSalidaDTO.class
+        return pacienteRepository.findById(id).map(paciente -> modelMapper.map(paciente, PacienteSalidaDTO.class
         )).orElseGet(() -> {
             LOGGER.info("No se encontró el paciente con id: {}", id);
             return null;
@@ -68,11 +69,13 @@ public class PacienteServiceImpl implements IPacienteService {
     }
 
     @Override
-    public void eliminarPaciente(Long id) {
-        pacienteRepository.findById(id).ifPresentOrElse(
-                pacienteRepository::delete,
-                () -> LOGGER.info("No se encontró el paciente a eliminar con id: {}", id)
-        );
+    public void eliminarPaciente(Long id) throws ResourceNotFoundException {
+        if (!pacienteRepository.existsById(id)) {
+            throw new ResourceNotFoundException("No se encontró el paciente con id: " + id);
+        }
+        pacienteRepository.deleteById(id);
+        LOGGER.info("Paciente eliminado con id: {}", id);
+
     }
 
     private void configureMapping() {
