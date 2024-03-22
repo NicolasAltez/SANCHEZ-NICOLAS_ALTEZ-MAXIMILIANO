@@ -4,6 +4,7 @@ package com.backend.integrador.service.impl;
 import com.backend.integrador.dto.odontologo.OdontologoEntradaDTO;
 import com.backend.integrador.dto.odontologo.OdontologoSalidaDTO;
 import com.backend.integrador.entity.Odontologo;
+import com.backend.integrador.exception.ResourceNotFoundException;
 import com.backend.integrador.repository.OdontologoRepository;
 import com.backend.integrador.service.IOdontologoService;
 import com.backend.integrador.utils.JsonPrinter;
@@ -30,9 +31,8 @@ public class OdontologoServiceImpl implements IOdontologoService {
 
     @Override
     public OdontologoSalidaDTO guardarOdontologo(OdontologoEntradaDTO odontologo) {
-        LOGGER.info("OdontologoEntradaDTO {}", JsonPrinter.toString(odontologo));
         Odontologo odontologoGuardado = odontologoRepository.save(modelMapper.map(odontologo, Odontologo.class));
-        LOGGER.info("OdontologoSAlidaDTO {}", odontologoGuardado);
+        LOGGER.info("Odontologo guardado: {}", odontologoGuardado);
         return modelMapper.map(odontologoGuardado, OdontologoSalidaDTO.class);
     }
 
@@ -54,22 +54,26 @@ public class OdontologoServiceImpl implements IOdontologoService {
     }
 
     @Override
-    public void eliminarOdontologo(Long id) {
-       odontologoRepository.findById(id).ifPresentOrElse(
-               odontologoRepository::delete,
-               () -> LOGGER.info("No se encontró el odontologo a eliminar con id: {}", id)
-       );
+    public void eliminarOdontologo(Long id) throws ResourceNotFoundException {
+        if (!odontologoRepository.existsById(id)) {
+            throw new ResourceNotFoundException("No se encontró el odontologo con id: " + id);
+        }
+        odontologoRepository.deleteById(id);
+        LOGGER.info("Odontologo eliminado con id: {}", id);
     }
 
 
     @Override
-    public OdontologoSalidaDTO actualizarOdontologo(OdontologoEntradaDTO odontologo,Long id) {
+    public OdontologoSalidaDTO actualizarOdontologo(OdontologoEntradaDTO odontologo, Long id) {
         Optional<Odontologo> odontologoAActualizar = odontologoRepository.findById(id);
-        if (odontologoAActualizar.isPresent()){
-            odontologoAActualizar.get().setApellido(odontologo.getApellido());
-            odontologoAActualizar.get().setNombre(odontologo.getNombre());
-            odontologoAActualizar.get().setNumeroDeMatricula(odontologo.getNumeroDeMatricula());
-            Odontologo odontologoActualizado = odontologoRepository.save(odontologoAActualizar.get());
+        if (odontologoAActualizar.isPresent()) {
+            Odontologo odontologoActualizado = odontologoRepository.save(modelMapper.map(Odontologo.builder()
+                    .id(id)
+                    .apellido(odontologo.getApellido())
+                    .nombre(odontologo.getNombre())
+                    .numeroDeMatricula(odontologo.getNumeroDeMatricula())
+                    .build(), Odontologo.class));
+            LOGGER.info("Odontologo actualizado: {}", odontologoActualizado);
             return modelMapper.map(odontologoActualizado, OdontologoSalidaDTO.class);
         } else {
             LOGGER.info("No se encontró el odontologo a actualizar con matricula: {}", odontologo.getNumeroDeMatricula());

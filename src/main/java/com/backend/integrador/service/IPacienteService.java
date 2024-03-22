@@ -2,6 +2,7 @@ package com.backend.integrador.service;
 
 import com.backend.integrador.dto.paciente.PacienteEntradaDTO;
 import com.backend.integrador.dto.paciente.PacienteSalidaDTO;
+import com.backend.integrador.exception.ResourceNotFoundException;
 
 import java.util.List;
 
@@ -15,5 +16,5 @@ public interface IPacienteService {
 
     PacienteSalidaDTO actualizarPaciente(PacienteEntradaDTO paciente);
 
-    void eliminarPaciente(Long id);
+    void eliminarPaciente(Long id) throws ResourceNotFoundException;
 }

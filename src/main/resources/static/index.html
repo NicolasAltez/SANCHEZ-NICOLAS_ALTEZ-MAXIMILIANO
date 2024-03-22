@@ -50,6 +50,14 @@
         .card-icon:hover {
             transform: scale(1.1);
         }
+
+        /* Alinea los botones verticalmente */
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -67,7 +75,7 @@
                 <h2 class="mb-4 animate__animated animate__fadeIn">Selecciona una opción para continuar:</h2>
                 <div class="card-deck d-flex align-items-stretch justify-content-center">
                     <div class="card border-primary mb-3 animate__animated animate__fadeInLeft">
-                        <div class="card-body text-center">
+                        <div class="card-body text-center align-self-center">
                             <i class="fas fa-user-md card-icon"></i>
                             <h5 class="card-title mt-3">Gestión de Odontólogos</h5>
                             <p class="card-text">Administra y consulta información de los odontólogos de nuestra clínica.</p>
@@ -75,11 +83,19 @@
                         </div>
                     </div>
                     <div class="card border-primary mb-3 animate__animated animate__fadeInRight">
-                        <div class="card-body text-center">
+                        <div class="card-body text-center align-self-center">
                             <i class="fas fa-calendar-alt card-icon"></i>
                             <h5 class="card-title mt-3">Gestión de Turnos</h5>
                             <p class="card-text">Programa, consulta y actualiza los turnos de nuestros pacientes.</p>
                             <a href="turnos.html" class="btn btn-primary">Ir a Gestión de Turnos</a>
+                        </div>
+                    </div>
+                    <div class="card border-primary mb-3 animate__animated animate__fadeInRight">
+                        <div class="card-body text-center align-self-center">
+                            <i class="fas fa-user-friends card-icon"></i>
+                            <h5 class="card-title mt-3">Gestión de Pacientes</h5>
+                            <p class="card-text">Administra y consulta información de los pacientes de nuestra clínica.</p>
+                            <a href="pacientes.html" class="btn btn-primary">Ir a Gestión de Pacientes</a>
                         </div>
                     </div>
                 </div>

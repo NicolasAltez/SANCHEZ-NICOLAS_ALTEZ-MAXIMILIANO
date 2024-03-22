@@ -1,5 +1,5 @@
 $(document).ready(()=>{
-    const listarOdontologos = () =>{
+    const listarPacientes = () =>{
         $.ajax({
             url: "http://localhost:8080/pacientes",
             type: "GET",
@@ -15,10 +15,10 @@ $(document).ready(()=>{
                         <td>${element.apellido}</td>
                         <td>${element.dni}</td>
                         <td>${element.fechaIngreso}</td>
-                        <td>${element.calle}</td>
-                        <td>${element.numero}</td>
-                        <td>${element.localidad}</td>
-                        <td>${element.provincia}</td>
+                        <td>${element.domicilioSalidaDTO.calle}</td>
+                        <td>${element.domicilioSalidaDTO.numero}</td>
+                        <td>${element.domicilioSalidaDTO.localidad}</td>
+                        <td>${element.domicilioSalidaDTO.provincia}</td>
                         <td>
                             <button id="btn-detalle-pacietne" class="btn btn-warning">Detalle</button>
                         </td>
@@ -39,23 +39,23 @@ $(document).ready(()=>{
     }
     const guardarPaciente = () =>{
         $('#guardarPaciente').on('click',function(){
-            const domicilio = {
-                calle: $('#calle').val(),
-                numero: $('#numero').val(),
-                localidad: $('#localidad').val(),
-                provincia: $('#provincia').val(),
-            }
             const paciente = {
                 nombre: $('#nombre').val(),
                 apellido: $('#apellido').val(),
                 dni: $('#dni').val(),
                 fechaIngreso: $('#fechaIngreso').val(),
-                domicilio: domicilio
+                domicilioEntradaDTO: {
+                    calle: $('#calle').val(),
+                    numero: $('#numero').val(),
+                    localidad: $('#localidad').val(),
+                    provincia: $('#provincia').val()
+                }
             }
+            console.log(`este es el paciente ${paciente}`);
 
             $.ajax({
 
-                url: "http://localhost:8080/odontologos",
+                url: "http://localhost:8080/pacientes",
                 contentType: "application/json",
                 type: "POST",
                 data: JSON.stringify(paciente),
@@ -128,9 +128,10 @@ $(document).ready(()=>{
                     $('#apellido').val(res.apellido);
                     $('#dni').val(res.dni);
                     $('#fechaIngreso').val(res.fechaIngreso);
-                    $('#domicilio').val(res.calle, res.numero, res.localidad, res.provincia);  //ver---------------------
-
-
+                    $('#calle').val(res.calle);
+                    $('#numero').val(res.numero);
+                    $('#localidad').val(res.localidad);
+                    $('#provincia').val(res.provincia);
                 }
             })
     })
@@ -144,18 +145,18 @@ $(document).ready(()=>{
             $('#actualizarPaciente').css('display','block');
 
             const domicilioAModificar = {
-                calle: $('#calle').val()
-                numero: $('#numero').val()
-                localidad: $('#localidad').val()
+                calle: $('#calle').val(),
+                numero: $('#numero').val(),
+                localidad: $('#localidad').val(),
                 provincia: $('#provincia').val()
 
             }
 
             const pacienteAModificar = {
                 nombre: $('#nombre').val(),
-                apellido: $('#apellido').val()
-                dni: $('#dni').val()
-                fechaIngreso: $('#apellido').val()
+                apellido: $('#apellido').val(),
+                dni: $('#dni').val(),
+                fechaIngreso: $('#apellido').val(),
                 domicilio: domicilioAModificar
 
 
@@ -164,7 +165,7 @@ $(document).ready(()=>{
             console.log(id);
 
             $.ajax({
-                url: `http://localhost:8080/odontologos/actualizar/${id}`,
+                url: `http://localhost:8080/pacientes/actualizar/${id}`,
                 contentType: "application/json",
                 type: "PUT",
                 data: JSON.stringify(pacienteAModificar),
