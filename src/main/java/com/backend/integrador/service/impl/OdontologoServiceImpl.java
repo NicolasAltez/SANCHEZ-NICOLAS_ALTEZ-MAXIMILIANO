@@ -63,10 +63,14 @@ public class OdontologoServiceImpl implements IOdontologoService {
 
 
     @Override
-    public OdontologoSalidaDTO actualizarOdontologo(OdontologoEntradaDTO odontologo) {
-        Optional<Odontologo> odontologoAActualizar = odontologoRepository.findByNumeroDeMatricula(odontologo.getNumeroDeMatricula());
+    public OdontologoSalidaDTO actualizarOdontologo(OdontologoEntradaDTO odontologo,Long id) {
+        Optional<Odontologo> odontologoAActualizar = odontologoRepository.findById(id);
         if (odontologoAActualizar.isPresent()){
-            return modelMapper.map(odontologoAActualizar, OdontologoSalidaDTO.class);
+            odontologoAActualizar.get().setApellido(odontologo.getApellido());
+            odontologoAActualizar.get().setNombre(odontologo.getNombre());
+            odontologoAActualizar.get().setNumeroDeMatricula(odontologo.getNumeroDeMatricula());
+            Odontologo odontologoActualizado = odontologoRepository.save(odontologoAActualizar.get());
+            return modelMapper.map(odontologoActualizado, OdontologoSalidaDTO.class);
         } else {
             LOGGER.info("No se encontró el odontologo a actualizar con matricula: {}", odontologo.getNumeroDeMatricula());
             return null;

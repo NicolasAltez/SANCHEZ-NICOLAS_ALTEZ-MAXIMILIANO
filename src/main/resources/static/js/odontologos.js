@@ -111,6 +111,7 @@ $(document).ready(()=>{
                 type: "GET",
                 dataType: "json",
                 success: (res) => {
+                    $('#idOdontologo').val(res.id);
                     $('#numeroDeMatricula').val(res.numeroDeMatricula);
                     $('#nombre').val(res.nombre);
                     $('#apellido').val(res.apellido);
@@ -121,8 +122,7 @@ $(document).ready(()=>{
 
     const actualizarOdontologo = () => {
         $('#actualizarOdontologo').on('click',function(){
-            let id = $('#idOdontologo').val();
-            
+            let id = $('#idOdontologo').val();            
             $('#guardarOdontologo').css('display','none');
             $('#actualizarOdontologo').css('display','block');
             
@@ -132,11 +132,10 @@ $(document).ready(()=>{
                 nombre: $('#nombre').val(),
                 apellido: $('#apellido').val()
             }
-            console.log(odontologoAModificar)
             console.log(id);
 
             $.ajax({
-                url: `http://localhost:8080/odontologos/actualizar/${id}`,
+                url: `http://localhost:8080/odontologos/${id}`,
                 contentType: "application/json",
                 type: "PUT",
                 data: JSON.stringify(odontologoAModificar),
