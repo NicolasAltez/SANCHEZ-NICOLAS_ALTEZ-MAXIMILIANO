@@ -1,15 +1,5 @@
 $(document).ready(() => {
 
-    const calendar = new VanillaCalendar('#calendar', {
-        settings: {
-            selection: {
-                time: true,
-            },
-        },
-    });
-
-    calendar.init();
-
     const listarTurnos = () => {
         $.ajax({
             url: "http://localhost:8080/turnos",
@@ -20,20 +10,45 @@ $(document).ready(() => {
                 let data = "";
                 res.forEach((turno) => {
                     data += `
-                        <div class="col-md-4">
-                            <div class="card text-dark bg-light mb-3" data-id="${turno.id}">
-                                <div class="card-header">${turno.odontologo.nombre} ${turno.odontologo.apellido}</div>
-                                <div class="card-body">
-                                    <h5 class="card-title">Turno ID: ${turno.id}</h5>
-                                    <p class="card-text">Fecha y Hora: ${new Date(turno.fechaYHora).toLocaleString()}</p>
-                                    <p class="card-text">Paciente: ${turno.paciente.nombre} ${turno.paciente.apellido}</p>
-                                    <p class="card-text">DNI del paciente: ${turno.paciente.dni}</p>
-                                    <button id="btn-detalle-turno" class="btn btn-success">Detalle</button>
-                                    <button id="btn-eliminar-turno" class="btn btn-danger">Eliminar</button>
+                    <div class="col-md-4">
+                    <div class="card text-dark bg-light mb-3" data-id="${turno.id}">
+                        <div class="card-header" style="text-transform: uppercase;"><strong>Odontólogo:</strong> ${turno.odontologo.nombre} ${turno.odontologo.apellido}</div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <h5 class="card-title"><strong>Turno ID:</strong> ${turno.id}</h5>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <p class="card-text"><strong>Matricula Odontologo:</strong> ${turno.odontologo.numeroDeMatricula}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <p class="card-text"><strong>Fecha y Hora:</strong> ${new Date(turno.fechaYHora).toLocaleString()}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <p class="card-text"><strong>Paciente:</strong> ${turno.paciente.nombre} ${turno.paciente.apellido}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <p class="card-text"><strong>DNI del paciente:</strong> ${turno.paciente.dni}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button id="btn-detalle-turno" class="btn btn-success mr-2">Detalle</button>
+                                    <button id="btn-eliminar-turno" class="btn btn-danger mr-2">Eliminar</button>
                                     <button id="btn-actualizar-turno" class="btn btn-primary">Actualizar</button>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
                     `;
                 });
 
@@ -52,11 +67,12 @@ $(document).ready(() => {
                 dataType: "json",
                 success: function(response) {
                     let detalleTurnoHtml = `
-                        <p>Detalle del turno con ID: ${response.id}</p>
-                        <p>Fecha y Hora: ${new Date(response.fechaYHora).toLocaleString()}</p>
-                        <p>Odontólogo: ${response.odontologo.nombre} ${response.odontologo.apellido}</p>
-                        <p>Paciente: ${response.paciente.nombre} ${response.paciente.apellido}</p>
-                        <p>DNI del paciente: ${response.paciente.dni}</p>
+                        <p><strong>Detalle del turno con ID:</strong> ${response.id}</p>
+                        <p><strong>Fecha y Hora:</strong> ${new Date(response.fechaYHora).toLocaleString()}</p>
+                        <p><strong>Odontólogo:</strong> ${response.odontologo.nombre} ${response.odontologo.apellido}</p>
+                        <p><strong>Matricula del odontólogo:</strong> ${response.odontologo.numeroDeMatricula}</p>
+                        <p><strong>Paciente:</strong> ${response.paciente.nombre} ${response.paciente.apellido}</p>
+                        <p><strong>DNI del paciente:</strong> ${response.paciente.dni}</p>
                     `;
                     $("#detalleTurno").html(detalleTurnoHtml);
                     $("#modalDetalleTurno").modal("show");
@@ -111,19 +127,18 @@ $(document).ready(() => {
         $(document).on('click','#guardarTurno',function(){
         let odontologoId = $("#selectOdontologo").val();
         let pacienteId = $("#selectPaciente").val();
-        let fechaYHora = calendar.selectedDates;
-        console.log("Fecha y Hora:", fechaYHora);
-        let data = {
+        let fechaYHora = $("#fechaYHora").val();
+        let fechaFormateada = formatearFecha(fechaYHora);
+        let turno = {
             odontologoId: odontologoId,
             pacienteId: pacienteId,
-            fechaYHora: fechaYHora,
+            fechaYHora: fechaFormateada,
         };
-        console.log("Datos del turno:", data);
         $.ajax({
             url: "http://localhost:8080/turnos",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify(data),
+            data: JSON.stringify(turno),
             success: function(response) {
                 console.log("Turno guardado:", response);
                 listarTurnos();
@@ -134,6 +149,18 @@ $(document).ready(() => {
             }
         });
     })};
+
+    const formatearFecha = (fechaYHora) => {
+        const fecha = new Date(fechaYHora);
+        const year = fecha.getFullYear();
+        const month = String(fecha.getMonth() + 1).padStart(2, "0");
+        const day = String(fecha.getDate()).padStart(2, "0");
+        const hours = String(fecha.getHours()).padStart(2, "0");
+        const minutes = String(fecha.getMinutes()).padStart(2, "0");
+        const seconds = "00";
+        const fechaFormateada = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        return fechaFormateada;
+    }
 
     const eliminarTurno = () => {
         $(document).on('click', '#btn-eliminar-turno', function() {
@@ -154,9 +181,9 @@ $(document).ready(() => {
     };
 
     const actualizarTurno = () => {
+        let id = null;
         $(document).on('click', '#btn-actualizar-turno', function() {
-            let id = $(this).closest(".card").data("id");
-            console.log("ID del turno a actualizar:", id);
+             id = $(this).closest(".card").data("id");
             $.ajax({
                 url: `http://localhost:8080/turnos/${id}`,
                 type: "GET",
@@ -199,12 +226,39 @@ $(document).ready(() => {
                 }
             });
         });
+        $(document).on('click', '#actualizarTurno', function() {
+            console.log("ID del turno a actualizar:", id);
+            let pacienteId = $("#selectPacienteActualizacion").val();
+            let odontologoId = $("#selectOdontologoActualizacion").val();
+            let fechaYHora = $("#fechaYHoraActualizar").val();
+            console.log("Fecha y hora:", fechaYHora);
+            let fechaFormateada = formatearFecha(fechaYHora);
+            console.log("Fecha formateada:", fechaFormateada);
+            let turno = {
+                odontologoId: odontologoId,
+                pacienteId: pacienteId,
+                fechaYHora: fechaFormateada,
+            };
+            console.log("Turno a actualizar:", turno);
+            $.ajax({
+                url: `http://localhost:8080/turnos/${id}`,
+                type: "PUT",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(turno),
+                success: function(response) {
+                    console.log("Turno actualizado:", response);
+                    listarTurnos();
+                    $("#modalActualizarTurno").modal("hide");
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error al actualizar turno:", error);
+                }
+            });
+        });
     };
     
     actualizarTurno();
-    
-
-
     cargarOdontologos();
     cargarPacientes();
     listarTurnos();

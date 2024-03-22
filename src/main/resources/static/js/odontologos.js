@@ -5,7 +5,6 @@ $(document).ready(()=>{
             type: "GET",
             dataType: "json",
             success: function(res){
-                console.log(res);
                 let data = '';
                 res.forEach(element =>{
                     data+=`
@@ -57,27 +56,30 @@ $(document).ready(()=>{
         })
     }
 
-    const detalleOdontologo = () =>{
-        $(document).on('click','#btn-detalle-odontologo',function(){
+    const detalleOdontologo = () => {
+        $(document).on('click', '#btn-detalle-odontologo', function() {
             let btnDetalleOdontologo = $(this)[0].parentElement.parentElement;
             let id = $(btnDetalleOdontologo).attr('odontologoId');
             $.ajax({
                 url: `http://localhost:8080/odontologos/${id}`,
                 type: "GET",
                 dataType: "json",
-                success: (res) => {
-                    let data = `
-                    <strong>Numero de matricula:</strong> ${res.numeroDeMatricula} - <strong>Nombre:</strong> ${res.nombre} - <strong>Apellido:</strong> ${res.apellido} <br><br>
-                    <button id="btn-limpiar" class="btn btn-warning">Limpiar</button>
-                    `
-                    let odontologo = $('#odontologo-detalle').html(data);
-                    $('#btn-limpiar').on('click', () =>{
-                        odontologo.html('');
-                    })
+                success: function(response) {
+                    let detalleTurnoHtml = `
+                        <p><strong>Detalle del odontologo con ID:</strong> ${response.id}</p>
+                        <p><strong>Numero De Matricula:</strong> ${response.numeroDeMatricula}</p>
+                        <p><strong>Nombre:</strong> ${response.nombre}</p>
+                        <p><strong>Apellido:</strong> ${response.apellido}</p>
+                    `;
+                    $("#detalleOdontologo").html(detalleTurnoHtml);
+                    $("#modalDetalleOdontologo").modal("show");
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error al obtener detalles del odonotologo:", error);
                 }
-            })
-        })
-    }
+            });
+        });
+    };
 
     const eliminarOdontologo = () => {
         $(document).on('click','#btn-eliminar-odontologo',function(){

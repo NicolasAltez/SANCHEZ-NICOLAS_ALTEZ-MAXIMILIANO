@@ -86,8 +86,19 @@ public class TurnoServiceImpl implements ITurnoService {
     }
 
     @Override
-    public TurnoSalidaDTO actualizarTurno(TurnoEntradaDTO turnoEntradaDTO) {
-        return null; //TODO implementar
+    public TurnoSalidaDTO actualizarTurno(TurnoEntradaDTO turnoEntradaDTO, Long id) {
+        Optional<Turno> turno = turnoRepository.findById(id);
+        if (turno.isPresent()) {
+            Turno turnoAActualizar = turno.get();
+            turnoAActualizar.setFechaYHora(turnoEntradaDTO.getFechaYHora());
+            turnoAActualizar.setOdontologo(odontologoRepository.findById(turnoEntradaDTO.getOdontologoId()).orElse(null));
+            turnoAActualizar.setPaciente(pacienteRepository.findById(turnoEntradaDTO.getPacienteId()).orElse(null));
+            Turno turnoActualizado = turnoRepository.save(turnoAActualizar);
+            return modelMapper.map(turnoActualizado, TurnoSalidaDTO.class);
+        } else {
+            LOGGER.info("No se encontró el turno a actualizar con id: {}", id);
+            return null;
+        }
     }
 
 }

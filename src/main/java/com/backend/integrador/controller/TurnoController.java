@@ -38,9 +38,9 @@ public class TurnoController {
         return new ResponseEntity<>("Se borro correctamente el turno", HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping
-    public ResponseEntity<TurnoSalidaDTO> actualizarTurno(@RequestBody @Valid TurnoEntradaDTO turnoEntradaDTO ){
-        return new ResponseEntity<>(turnoService.actualizarTurno(turnoEntradaDTO), HttpStatus.OK);
+    @PutMapping("/{id}")
+    public ResponseEntity<TurnoSalidaDTO> actualizarTurno(@RequestBody @Valid TurnoEntradaDTO turnoEntradaDTO, @PathVariable Long id){
+        return new ResponseEntity<>(turnoService.actualizarTurno(turnoEntradaDTO,id), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

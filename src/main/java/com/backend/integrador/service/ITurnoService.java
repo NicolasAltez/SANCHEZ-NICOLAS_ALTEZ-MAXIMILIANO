@@ -16,5 +16,5 @@ public interface ITurnoService {
 
     void eliminarTurno(Long id);
 
-    TurnoSalidaDTO actualizarTurno(TurnoEntradaDTO turnoEntradaDTO);
+    TurnoSalidaDTO actualizarTurno(TurnoEntradaDTO turnoEntradaDTO,Long id);
 }
