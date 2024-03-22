@@ -43,9 +43,9 @@ public class OdontologoController {
     }
 
 
-    @PutMapping
-    public ResponseEntity<OdontologoSalidaDTO> actualizarOdontologo(@RequestBody @Valid OdontologoEntradaDTO odontologo) {
-        return new ResponseEntity<>(odontologoService.actualizarOdontologo(odontologo), HttpStatus.OK);
+    @PutMapping("{id}")
+    public ResponseEntity<OdontologoSalidaDTO> actualizarOdontologo(@RequestBody @Valid OdontologoEntradaDTO odontologo,@PathVariable Long id) {
+        return new ResponseEntity<>(odontologoService.actualizarOdontologo(odontologo,id), HttpStatus.OK);
     }
 
 }
