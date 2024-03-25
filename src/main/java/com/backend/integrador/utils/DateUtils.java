@@ -13,7 +13,4 @@ public class DateUtils {
         return LocalDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
-
-
-
 }

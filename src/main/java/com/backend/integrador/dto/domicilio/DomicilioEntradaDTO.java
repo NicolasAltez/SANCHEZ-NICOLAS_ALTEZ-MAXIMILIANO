@@ -1,15 +1,13 @@
 package com.backend.integrador.dto.domicilio;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class DomicilioEntradaDTO {
     @NotNull(message = "El campo calle no puede ser nulo")
     @NotBlank(message = "El campo calle no puede estar en blanco")

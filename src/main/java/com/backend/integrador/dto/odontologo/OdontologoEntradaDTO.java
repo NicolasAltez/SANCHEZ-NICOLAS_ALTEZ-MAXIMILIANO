@@ -2,15 +2,13 @@ package com.backend.integrador.dto.odontologo;
 
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class OdontologoEntradaDTO {
 
     @NotNull(message = "El numero de matricula del odontologo no puede ser nulo")

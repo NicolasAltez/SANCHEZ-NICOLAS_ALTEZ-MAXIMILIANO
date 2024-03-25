@@ -2,6 +2,7 @@ package com.backend.integrador.service.impl;
 
 import com.backend.integrador.dto.paciente.PacienteEntradaDTO;
 import com.backend.integrador.dto.paciente.PacienteSalidaDTO;
+import com.backend.integrador.entity.Domicilio;
 import com.backend.integrador.entity.Paciente;
 import com.backend.integrador.exception.ResourceNotFoundException;
 import com.backend.integrador.repository.PacienteRepository;
@@ -56,10 +57,10 @@ public class PacienteServiceImpl implements IPacienteService {
     }
 
     @Override
-    public PacienteSalidaDTO actualizarPaciente(PacienteEntradaDTO paciente) {
-        Optional<Paciente> pacienteAModificar = pacienteRepository.findByDni(paciente.getDni());
+    public PacienteSalidaDTO actualizarPaciente(PacienteEntradaDTO paciente, Long id) {
+        Optional<Paciente> pacienteAModificar = pacienteRepository.findById(id);
         if (pacienteAModificar.isPresent()) {
-            Paciente pacienteModificado = pacienteRepository.save(modelMapper.map(paciente, Paciente.class));
+            Paciente pacienteModificado = pacienteRepository.save(modelMapper.map(crearPacienteAModificar(paciente,pacienteAModificar.get()), Paciente.class));
             LOGGER.info("Paciente modificado: {}", pacienteModificado);
             return modelMapper.map(pacienteModificado, PacienteSalidaDTO.class);
         } else {
@@ -86,5 +87,22 @@ public class PacienteServiceImpl implements IPacienteService {
         modelMapper.typeMap(Paciente.class, PacienteSalidaDTO.class)
                 .addMappings(mapper -> mapper.map(Paciente::getDomicilio, PacienteSalidaDTO::setDomicilioSalidaDTO));
 
+    }
+
+    private Paciente crearPacienteAModificar(PacienteEntradaDTO pacienteEntradaDTO, Paciente pacienteExistente) {
+        return Paciente.builder()
+                .id(pacienteExistente.getId())
+                .nombre(pacienteEntradaDTO.getNombre())
+                .apellido(pacienteEntradaDTO.getApellido())
+                .dni(pacienteEntradaDTO.getDni())
+                .fechaIngreso(pacienteEntradaDTO.getFechaIngreso())
+                .domicilio(Domicilio.builder()
+                        .id(pacienteExistente.getDomicilio().getId())
+                        .calle(pacienteEntradaDTO.getDomicilioEntradaDTO().getCalle())
+                        .numero(pacienteEntradaDTO.getDomicilioEntradaDTO().getNumero())
+                        .localidad(pacienteEntradaDTO.getDomicilioEntradaDTO().getLocalidad())
+                        .provincia(pacienteEntradaDTO.getDomicilioEntradaDTO().getProvincia())
+                        .build())
+                .build();
     }
 }
