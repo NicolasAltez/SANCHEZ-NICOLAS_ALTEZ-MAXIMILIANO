@@ -28,17 +28,17 @@ public class OdontologoController {
     }
 
     @GetMapping
-    public HttpEntity<List<OdontologoSalidaDTO>> buscarTodosLosOdontologos() {
+    public ResponseEntity<List<OdontologoSalidaDTO>> buscarTodosLosOdontologos() {
         return new ResponseEntity<>(odontologoService.buscarTodosLosOdontologos(), HttpStatus.OK);
     }
 
     @PostMapping
-    public HttpEntity<OdontologoSalidaDTO> guardarOdontologo(@RequestBody @Valid OdontologoEntradaDTO odontologo) {
+    public ResponseEntity<OdontologoSalidaDTO> guardarOdontologo(@RequestBody @Valid OdontologoEntradaDTO odontologo) {
         return new ResponseEntity<>(odontologoService.guardarOdontologo(odontologo), HttpStatus.CREATED);
     }
 
     @DeleteMapping("{id}")
-    public HttpEntity<String> eliminarOdontologo(@PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<String> eliminarOdontologo(@PathVariable Long id) throws ResourceNotFoundException {
         odontologoService.eliminarOdontologo(id);
         return new ResponseEntity<>("Se borro correctamente el odontologo", HttpStatus.NO_CONTENT);
     }
