@@ -6,6 +6,7 @@ import com.backend.integrador.dto.paciente.PacienteEntradaDTO;
 import com.backend.integrador.dto.paciente.PacienteSalidaDTO;
 import com.backend.integrador.entity.Domicilio;
 import com.backend.integrador.entity.Paciente;
+import com.backend.integrador.exception.ResourceNotFoundException;
 import com.backend.integrador.repository.PacienteRepository;
 import com.backend.integrador.service.IPacienteService;
 
@@ -41,9 +42,6 @@ class PacienteControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @MockBean
-    PacienteRepository pacienteRepository;
 
     @MockBean
     private IPacienteService pacienteService;
@@ -173,6 +171,8 @@ class PacienteControllerTest {
                     )))
                     .andExpect(jsonPath("$.status").value("BAD_REQUEST"));
 
+            verify(pacienteService, never()).guardarPaciente(any(PacienteEntradaDTO.class));
+
         }
 
         @Test
@@ -204,6 +204,8 @@ class PacienteControllerTest {
                             "La provincia debe tener entre 2 y 255 caracteres"
                     )))
                     .andExpect(jsonPath("$.status").value("BAD_REQUEST"));
+
+            verify(pacienteService, never()).guardarPaciente(any(PacienteEntradaDTO.class));
         }
 
         @Test
@@ -240,6 +242,8 @@ class PacienteControllerTest {
                             "El Dni debe tener como máximo 8 dígitos"
                     )))
                     .andExpect(jsonPath("$.status").value("BAD_REQUEST"));
+
+            verify(pacienteService, never()).guardarPaciente(any(PacienteEntradaDTO.class));
         }
 
         @Test
@@ -268,6 +272,8 @@ class PacienteControllerTest {
                             "La fecha de ingreso debe ser posterior o igual a la fecha actual"
                     )))
                     .andExpect(jsonPath("$.status").value("BAD_REQUEST"));
+
+            verify(pacienteService, never()).guardarPaciente(any(PacienteEntradaDTO.class));
         }
     }
 
@@ -281,7 +287,8 @@ class PacienteControllerTest {
             ResultActions respuesta = mockMvc.perform(get("/pacientes"));
 
             respuesta.andExpect(status().isOk())
-                    .andExpect(content().string("[]"));
+                    .andExpect(content().string("[]"))
+                    .andExpect(jsonPath("$", hasSize(0)));
 
             verify(pacienteService, times(1)).listarPacientes();
         }
@@ -314,7 +321,6 @@ class PacienteControllerTest {
         @Test
         void dadoIdPacienteValido_cuandoEliminarPaciente_EntoncesRetornaOk() throws Exception {
 
-            when(pacienteRepository.existsById(1L)).thenReturn(true);
             doNothing().when(pacienteService).eliminarPaciente(1L);
 
 
@@ -323,14 +329,13 @@ class PacienteControllerTest {
             respuesta.andExpect(status().isNoContent())
                     .andExpect(content().string("Se borro correctamente el paciente"));
 
-            //verify(pacienteRepository, times(1)).existsById(anyLong());
             verify(pacienteService, times(1)).eliminarPaciente(anyLong());
         }
 
         @Test
         void dadoIdPacienteInvaliod_cuandoEliminarPaciente_EntoncesRetornarNotFound() throws Exception {
 
-            when(pacienteRepository.existsById(240L)).thenReturn(false);
+            doThrow(ResourceNotFoundException.class).when(pacienteService).eliminarPaciente(1L);
 
             ResultActions respuesta = mockMvc.perform(delete("/pacientes/{id}", 240L));
 
@@ -339,8 +344,9 @@ class PacienteControllerTest {
                     .andExpect(jsonPath("$.timestamp").exists())
                     .andExpect(jsonPath("$.status").value("NOT_FOUND"));
 
-            //verify(pacienteRepository, times(1)).existsById(240L);
         }
+
+
 
     }
 
@@ -349,21 +355,6 @@ class PacienteControllerTest {
 
         @Test
         void dadoIdPacienteValido_cuandoActualizarPacienteEntoncesRetornarOk() throws Exception {
-
-            Paciente paciente = Paciente.builder()
-                    .id(1L)
-                    .nombre("Nicolas")
-                    .apellido("Altez")
-                    .dni(12345)
-                    .fechaIngreso(LocalDate.of(2024, 10, 12))
-                    .domicilio(Domicilio.builder()
-                            .id(1L)
-                            .provincia("Canelones")
-                            .calle("Avenida Libertador")
-                            .numero(1234)
-                            .localidad("UruguayPapapaaaaa")
-                            .build())
-                    .build();
 
             PacienteEntradaDTO pacienteAActualizar = PacienteEntradaDTO.builder()
                     .nombre("nombreActualizado")
@@ -393,8 +384,6 @@ class PacienteControllerTest {
                             .build())
                     .build();
 
-
-            when(pacienteRepository.findById(anyLong())).thenReturn(Optional.of(paciente));
             when(pacienteService.actualizarPaciente(any(PacienteEntradaDTO.class), eq(1L))).thenReturn(pacienteActualizado);
 
             ResultActions respuesta = mockMvc.perform(put("/pacientes/{id}", 1L)
@@ -412,15 +401,13 @@ class PacienteControllerTest {
                     .andExpect(jsonPath("$.domicilioSalidaDTO.localidad").value(pacienteActualizado.getDomicilioSalidaDTO().getLocalidad()))
                     .andExpect(jsonPath("$.domicilioSalidaDTO.provincia").value(pacienteActualizado.getDomicilioSalidaDTO().getProvincia()));
 
-            //verify(pacienteRepository, times(1)).findById(anyLong());
             verify(pacienteService, times(1)).actualizarPaciente(any(PacienteEntradaDTO.class), eq(1L));
-
 
         }
 
         @Test
         void dadoPacienteIdInvalido_cuandoActualizarPaciente_EntoncesRetornarOkYNull() throws Exception {
-            when(pacienteRepository.findById(anyLong())).thenReturn(Optional.empty());
+            when(pacienteService.actualizarPaciente(any(PacienteEntradaDTO.class), anyLong())).thenReturn(null);
 
             ResultActions respuesta = mockMvc.perform(put("/pacientes/{id}", 1L)
                     .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(pacienteEntradaDTO)));
@@ -428,7 +415,7 @@ class PacienteControllerTest {
             respuesta.andExpect(status().isOk())
                     .andExpect(content().string(""));
 
-            //verify(pacienteRepository, times(1)).findById(anyLong());
+            verify(pacienteService,times(1)).actualizarPaciente(any(PacienteEntradaDTO.class),anyLong());
         }
     }
 

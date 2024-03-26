@@ -2,6 +2,7 @@ package com.backend.integrador.controller;
 
 import com.backend.integrador.dto.odontologo.OdontologoEntradaDTO;
 import com.backend.integrador.dto.odontologo.OdontologoSalidaDTO;
+import com.backend.integrador.dto.paciente.PacienteEntradaDTO;
 import com.backend.integrador.repository.OdontologoRepository;
 import com.backend.integrador.service.IOdontologoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,9 +35,6 @@ class OdontologoControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @MockBean
-    private OdontologoRepository odontologoRepository;
 
     @MockBean
     private IOdontologoService odontologoService;
@@ -92,7 +90,8 @@ class OdontologoControllerTest {
 
             ResultActions respuesta = mockMvc.perform(get("/odontologos"));
 
-            respuesta.andExpect(status().isOk()).andExpect(content().string("[]"));
+            respuesta.andExpect(status().isOk()).andExpect(content().string("[]")).andExpect(jsonPath("$",hasSize(0)));
+            ;
 
             verify(odontologoService, times(1)).buscarTodosLosOdontologos();
         }
@@ -202,9 +201,10 @@ class OdontologoControllerTest {
     }
 
     @Nested
-    class eliminarOdontologoTests{
+    class eliminarOdontologoTests {
         @Test
         void dadoIdOdontologoValido_cuandoEliminarOdontologo_EntoncesRetornaNoContent() throws Exception {
+
             doNothing().when(odontologoService).eliminarOdontologo(1L);
 
             ResultActions respuesta = mockMvc.perform(delete("/odontologos/1"));
@@ -217,8 +217,6 @@ class OdontologoControllerTest {
         @Test
         void dadoIdOdontologoInvaliod_cuandoEliminarOdontologo_EntoncesRetornarNotFound() throws Exception {
 
-            when(odontologoRepository.existsById(24L)).thenReturn(false);
-
             ResultActions respuesta = mockMvc.perform(delete("/odontologos/{id}", 24L));
 
             respuesta.andExpect(status().isNotFound())
@@ -226,7 +224,6 @@ class OdontologoControllerTest {
                     .andExpect(jsonPath("$.timestamp").exists())
                     .andExpect(jsonPath("$.status").value("NOT_FOUND"));
 
-            //verify(odontologoRepository, times(1)).existsById(240L);
         }
 
     }
@@ -234,26 +231,36 @@ class OdontologoControllerTest {
     @Nested
     class actualizarOdontologoTests {
 
-        @Test //TODO MODIFICAR ESTO LUEGO
+        @Test
         void dadoOdontologoValido_cuandoActualizarOdontologo_EntoncesRetornaOdontologoYOk() throws Exception {
-            when(odontologoService.actualizarOdontologo(any(OdontologoEntradaDTO.class), eq(1L))).thenReturn(odontologoSalidaDTO);
+            OdontologoEntradaDTO odontologoAActualizar = OdontologoEntradaDTO.builder()
+                    .nombre("nuevoNombre")
+                    .apellido("nuevoApellido")
+                    .numeroDeMatricula("nuevoNumeroDeMatricula")
+                    .build();
+
+            OdontologoSalidaDTO odontologoActualizado = OdontologoSalidaDTO.builder()
+                    .id(1L)
+                    .nombre("nuevoNombre")
+                    .apellido("nuevoApellido")
+                    .numeroDeMatricula("nuevoNumeroDeMatricula")
+                    .build();
+
+            when(odontologoService.actualizarOdontologo(any(OdontologoEntradaDTO.class), eq(1L))).thenReturn(odontologoActualizado);
 
             ResultActions respuesta = mockMvc.perform(put("/odontologos/1")
                     .contentType("application/json")
-                    .content(objectMapper.writeValueAsString(OdontologoEntradaDTO.builder()
-                            .nombre("nicolas")
-                            .apellido("altez")
-                            .numeroDeMatricula("matricula")
-                            .build())));
+                    .content(objectMapper.writeValueAsString(odontologoAActualizar)));
 
             respuesta.andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").value(odontologoSalidaDTO.getId()))
-                    .andExpect(jsonPath("$.nombre").value(odontologoSalidaDTO.getNombre()))
-                    .andExpect(jsonPath("$.apellido").value(odontologoSalidaDTO.getApellido()))
-                    .andExpect(jsonPath("$.numeroDeMatricula").value(odontologoSalidaDTO.getNumeroDeMatricula()));
+                    .andExpect(jsonPath("$.id").value(odontologoActualizado.getId()))
+                    .andExpect(jsonPath("$.nombre").value(odontologoActualizado.getNombre()))
+                    .andExpect(jsonPath("$.apellido").value(odontologoActualizado.getApellido()))
+                    .andExpect(jsonPath("$.numeroDeMatricula").value(odontologoActualizado.getNumeroDeMatricula()));
 
             verify(odontologoService, times(1)).actualizarOdontologo(any(OdontologoEntradaDTO.class), eq(1L));
         }
+
         @Test
         void dadoOdontologoIdInvalido_CuandoActualizarOdontologo_entoncesRetornarOkYNull() throws Exception {
             when(odontologoService.actualizarOdontologo(any(OdontologoEntradaDTO.class), eq(1L))).thenReturn(null);
