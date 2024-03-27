@@ -113,7 +113,7 @@ class PacienteServiceImplTest {
         verify(pacienteRepository, times(1)).existsById(1L);
         verify(pacienteRepository, never()).deleteById(anyLong());
 
-        assertEquals("No se encontró el paciente con id: 1", resourceNotFoundException.getMessage());
+        assertEquals("No se encontró el paciente a eliminar con id: 1", resourceNotFoundException.getMessage());
     }
 
     @Test
@@ -126,7 +126,7 @@ class PacienteServiceImplTest {
     }
 
     @Test
-    void deberiaActualizarUnPacienteExistente_YRetornarElPacienteActualizado(){
+    void deberiaActualizarUnPacienteExistente_YRetornarElPacienteActualizado() throws ResourceNotFoundException {
         PacienteEntradaDTO pacienteEntradaActualizar = crearPacienteEntradaDTO("nuevoNombre","nuevoApellido",3333);
         Paciente crearPacienteActualizado = crearPaciente(1L,"nuevoNombre","nuevoApellido",3333);
 
@@ -141,6 +141,22 @@ class PacienteServiceImplTest {
         assertNotNull(pacienteActualizado);
         assertEquals(paciente.getId(),pacienteActualizado.getId());
         assertNotEquals(paciente.getNombre(),pacienteActualizado.getNombre());
+    }
+
+    @Test
+    void deberiaIntentarActualizarUnPacienteInexistente_YLanzarExcepcionConMensaje() {
+        PacienteEntradaDTO pacienteEntradaActualizar = crearPacienteEntradaDTO("nuevoNombre", "nuevoApellido", 3333);
+
+        when(pacienteRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException resourceNotFoundException = assertThrows(ResourceNotFoundException.class, () -> {
+            pacienteService.actualizarPaciente(pacienteEntradaActualizar, 1L);
+        });
+
+        verify(pacienteRepository, times(1)).findById(1L);
+        verify(pacienteRepository, never()).save(any(Paciente.class));
+
+        assertEquals("No se encontró el paciente a actualizar con id: 1", resourceNotFoundException.getMessage());
     }
 
 

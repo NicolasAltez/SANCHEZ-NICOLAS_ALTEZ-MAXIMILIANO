@@ -3,6 +3,7 @@ package com.backend.integrador.controller;
 import com.backend.integrador.dto.odontologo.OdontologoEntradaDTO;
 import com.backend.integrador.dto.odontologo.OdontologoSalidaDTO;
 import com.backend.integrador.dto.paciente.PacienteEntradaDTO;
+import com.backend.integrador.exception.ResourceNotFoundException;
 import com.backend.integrador.repository.OdontologoRepository;
 import com.backend.integrador.service.IOdontologoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +25,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -216,12 +218,18 @@ class OdontologoControllerTest {
         @Test
         void dadoIdOdontologoInvaliod_cuandoEliminarOdontologo_EntoncesRetornarNotFound() throws Exception {
 
-            ResultActions respuesta = mockMvc.perform(delete("/odontologos/{id}", 24L));
+            doAnswer(invocation -> {
+                throw new ResourceNotFoundException("No se encontró el odontologo a eliminar con id: " + invocation.getArgument(0));
+            }).when(odontologoService).eliminarOdontologo(1L);
+
+            ResultActions respuesta = mockMvc.perform(delete("/odontologos/{id}", 1L));
 
             respuesta.andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message").value("No se encontró el odontologo con id: 24"))
+                    .andExpect(jsonPath("$.mensaje").value("No se encontró el odontologo a eliminar con id: 1"))
                     .andExpect(jsonPath("$.timestamp").exists())
                     .andExpect(jsonPath("$.status").value("NOT_FOUND"));
+
+            verify(odontologoService, times(1)).eliminarOdontologo(1L);
 
         }
 
@@ -261,8 +269,11 @@ class OdontologoControllerTest {
         }
 
         @Test
-        void dadoOdontologoIdInvalido_CuandoActualizarOdontologo_entoncesRetornarOkYNull() throws Exception {
-            when(odontologoService.actualizarOdontologo(any(OdontologoEntradaDTO.class), eq(1L))).thenReturn(null);
+        void dadoOdontologoIdInvalido_CuandoActualizarOdontologo_entoncesRetornarNotFound() throws Exception {
+
+            doAnswer(invocation -> {
+                throw new ResourceNotFoundException("No se encontró el odontologo a actualizar con id: " + invocation.getArgument(1));
+            }).when(odontologoService).actualizarOdontologo(any(OdontologoEntradaDTO.class), eq(1L));
 
             ResultActions respuesta = mockMvc.perform(put("/odontologos/1")
                     .contentType("application/json")
@@ -271,10 +282,14 @@ class OdontologoControllerTest {
                             .apellido("altez")
                             .numeroDeMatricula("matricula")
                             .build())));
-
-            respuesta.andExpect(status().isOk()).andExpect(content().string(""));
+            respuesta.andDo(print());
+            respuesta.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.mensaje").value("No se encontró el odontologo a actualizar con id: 1"))
+                    .andExpect(jsonPath("$.timestamp").exists())
+                    .andExpect(jsonPath("$.status").value("NOT_FOUND"));
 
             verify(odontologoService, times(1)).actualizarOdontologo(any(OdontologoEntradaDTO.class), eq(1L));
+
         }
     }
 

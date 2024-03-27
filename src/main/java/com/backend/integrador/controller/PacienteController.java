@@ -43,7 +43,7 @@ public class PacienteController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<PacienteSalidaDTO> actualizarPaciente(@RequestBody @Valid PacienteEntradaDTO paciente, @PathVariable Long id) {
+    public ResponseEntity<PacienteSalidaDTO> actualizarPaciente(@RequestBody @Valid PacienteEntradaDTO paciente, @PathVariable Long id) throws ResourceNotFoundException {
         return new ResponseEntity<>(pacienteService.actualizarPaciente(paciente,id), HttpStatus.OK);
     }
 

@@ -123,7 +123,7 @@ class OdontologoServiceImplTest {
 
         verify(odontologoRepository, times(1)).existsById(1L);
         verify(odontologoRepository, never()).deleteById(1L);
-        assertEquals("No se encontró el odontologo con id: 1", resourceNotFoundException.getMessage());
+        assertEquals("No se encontró el odontologo a eliminar con id: 1", resourceNotFoundException.getMessage());
     }
 
     @Test
@@ -136,7 +136,7 @@ class OdontologoServiceImplTest {
     }
 
     @Test
-    void deberiaActualizarUnOdontologoExistente_YRetornarElOdontologoActualizado() {
+    void deberiaActualizarUnOdontologoExistente_YRetornarElOdontologoActualizado() throws ResourceNotFoundException {
 
         OdontologoEntradaDTO odontologoAModificar = OdontologoEntradaDTO.builder()
                 .nombre("Maximiliano")
@@ -165,6 +165,25 @@ class OdontologoServiceImplTest {
         assertNotEquals(odontologo.getNombre(), odontologoActualizado.getNombre());
         assertNotEquals(odontologo.getNumeroDeMatricula(), odontologoActualizado.getNumeroDeMatricula());
         assertNotEquals(odontologo.getApellido(), odontologoActualizado.getApellido());
+    }
+
+    @Test
+    void deberiaIntentarActualizarUnOdontologoInexistente_YLanzarExcepcionConMensaje() {
+        OdontologoEntradaDTO odontologoAModificar = OdontologoEntradaDTO.builder()
+                .nombre("Maximiliano")
+                .apellido("Acosta")
+                .numeroDeMatricula("123456")
+                .build();
+
+        when(odontologoRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException resourceNotFoundException = assertThrows(ResourceNotFoundException.class, () -> {
+            odontologoService.actualizarOdontologo(odontologoAModificar, 1L);
+        });
+
+        verify(odontologoRepository, times(1)).findById(1L);
+        verify(odontologoRepository, never()).save(any(Odontologo.class));
+        assertEquals("No se encontró el odontologo a actualizar con id: 1", resourceNotFoundException.getMessage());
     }
 
 }

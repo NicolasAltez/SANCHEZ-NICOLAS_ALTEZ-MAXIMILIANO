@@ -239,7 +239,7 @@ class TurnoServiceImplTest {
     }
 
     @Test
-    void deberiaActualizarUnTurnoExistente() {
+    void deberiaActualizarUnTurnoExistente() throws ResourceNotFoundException {
         LocalDateTime nuevaFechaYHora = LocalDateTime.of(2029, 10, 10, 10, 10);
 
         TurnoEntradaDTO turnoEntradaDTO = TurnoEntradaDTO.builder()
@@ -267,6 +267,30 @@ class TurnoServiceImplTest {
         assertNotEquals(turno.getFechaYHora(), turnoActualizado.getFechaYHora());
         assertNotEquals(turno.getOdontologo().getId(), turnoActualizado.getOdontologo().getId());
         assertNotEquals(turno.getPaciente().getId(), turnoActualizado.getPaciente().getId());
+    }
+
+    @Test
+    void deberiaIntentarActualizarUnTurnoInexistente_YLanzarExcepcionConMensaje() {
+        LocalDateTime nuevaFechaYHora = LocalDateTime.of(2029, 10, 10, 10, 10);
+
+        TurnoEntradaDTO turnoEntradaDTO = TurnoEntradaDTO.builder()
+                .odontologoId(2L)
+                .pacienteId(2L)
+                .fechaYHora(nuevaFechaYHora)
+                .build();
+
+        when(turnoRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException resourceNotFoundException = assertThrows(ResourceNotFoundException.class, () -> {
+            turnoService.actualizarTurno(turnoEntradaDTO, 1L);
+        });
+
+        verify(turnoRepository, times(1)).findById(1L);
+        verify(odontologoService, never()).buscarOdontologoPorId(anyLong());
+        verify(pacienteService, never()).buscarPacientePorId(anyLong());
+        verify(turnoRepository, never()).save(any(Turno.class));
+
+        assertEquals("No se encontró el turno a actualizar con id: 1", resourceNotFoundException.getMessage());
     }
 
 

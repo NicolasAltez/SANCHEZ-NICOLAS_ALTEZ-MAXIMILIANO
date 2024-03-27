@@ -87,7 +87,7 @@ public class TurnoServiceImpl implements ITurnoService {
     }
 
     @Override
-    public TurnoSalidaDTO actualizarTurno(TurnoEntradaDTO turnoEntradaDTO, Long id) {
+    public TurnoSalidaDTO actualizarTurno(TurnoEntradaDTO turnoEntradaDTO, Long id) throws ResourceNotFoundException {
         return turnoRepository.findById(id)
                 .map(turno -> {
                     OdontologoSalidaDTO odontologo = odontologoService.buscarOdontologoPorId(turnoEntradaDTO.getOdontologoId());
@@ -99,10 +99,7 @@ public class TurnoServiceImpl implements ITurnoService {
                             .fechaYHora(turnoEntradaDTO.getFechaYHora())
                             .build()), TurnoSalidaDTO.class);
                 })
-                .orElseGet(() -> {
-                    LOGGER.info("No se encontró el turno a actualizar con id: {}", id);
-                    return null;
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró el turno a actualizar con id: " + id));
     }
 
     private void validarOdontologoYPaciente(OdontologoSalidaDTO odontologo, PacienteSalidaDTO paciente) throws BadRequestException {

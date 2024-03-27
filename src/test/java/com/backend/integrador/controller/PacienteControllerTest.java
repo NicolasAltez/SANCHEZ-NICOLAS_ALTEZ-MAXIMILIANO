@@ -2,6 +2,7 @@ package com.backend.integrador.controller;
 
 import com.backend.integrador.dto.domicilio.DomicilioEntradaDTO;
 import com.backend.integrador.dto.domicilio.DomicilioSalidaDTO;
+import com.backend.integrador.dto.odontologo.OdontologoEntradaDTO;
 import com.backend.integrador.dto.paciente.PacienteEntradaDTO;
 import com.backend.integrador.dto.paciente.PacienteSalidaDTO;
 import com.backend.integrador.entity.Domicilio;
@@ -335,19 +336,22 @@ class PacienteControllerTest {
         @Test
         void dadoIdPacienteInvaliod_cuandoEliminarPaciente_EntoncesRetornarNotFound() throws Exception {
 
-            doThrow(ResourceNotFoundException.class).when(pacienteService).eliminarPaciente(1L);
+            doAnswer(invocation -> {
+                throw new ResourceNotFoundException("No se encontró el paciente a eliminar con id: " + invocation.getArgument(0));
+            }).when(pacienteService).eliminarPaciente(1L);
 
-            ResultActions respuesta = mockMvc.perform(delete("/pacientes/{id}", 240L));
+
+
+            ResultActions respuesta = mockMvc.perform(delete("/pacientes/1"));
 
             respuesta.andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.message").value("No se encontró el paciente con id: 240"))
+                    .andExpect(jsonPath("$.mensaje").value("No se encontró el paciente a eliminar con id: 1"))
                     .andExpect(jsonPath("$.timestamp").exists())
                     .andExpect(jsonPath("$.status").value("NOT_FOUND"));
 
+            verify(pacienteService, times(1)).eliminarPaciente(1L);
+
         }
-
-
-
     }
 
     @Nested
@@ -406,17 +410,38 @@ class PacienteControllerTest {
         }
 
         @Test
-        void dadoPacienteIdInvalido_cuandoActualizarPaciente_EntoncesRetornarOkYNull() throws Exception {
-            when(pacienteService.actualizarPaciente(any(PacienteEntradaDTO.class), anyLong())).thenReturn(null);
+        void dadoIdPacienteInvalido_cuandoActualizarPacienteEntoncesRetornarNotFound() throws Exception {
+
+            PacienteEntradaDTO pacienteAActualizar = PacienteEntradaDTO.builder()
+                    .nombre("nombreActualizado")
+                    .apellido("apellidoActualizado")
+                    .fechaIngreso(LocalDate.of(2035, 12, 12))
+                    .domicilioEntradaDTO(DomicilioEntradaDTO.builder()
+                            .numero(312)
+                            .provincia("provinciaActualizada")
+                            .calle("calleActualizada")
+                            .localidad("localidadActualizada")
+                            .build())
+                    .dni(54321)
+                    .build();
+
+            doAnswer(invocation -> {
+                throw new ResourceNotFoundException("No se encontró el paciente a actualizar con id: " + invocation.getArgument(1));
+            }).when(pacienteService).actualizarPaciente(any(PacienteEntradaDTO.class), eq(1L));
+
+
 
             ResultActions respuesta = mockMvc.perform(put("/pacientes/{id}", 1L)
-                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(pacienteEntradaDTO)));
+                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(pacienteAActualizar)));
 
-            respuesta.andExpect(status().isOk())
-                    .andExpect(content().string(""));
+            respuesta.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.mensaje").value("No se encontró el paciente a actualizar con id: 1"))
+                    .andExpect(jsonPath("$.timestamp").exists())
+                    .andExpect(jsonPath("$.status").value("NOT_FOUND"));
 
-            verify(pacienteService,times(1)).actualizarPaciente(any(PacienteEntradaDTO.class),anyLong());
+            verify(pacienteService, times(1)).actualizarPaciente(any(PacienteEntradaDTO.class), eq(1L));
         }
+
     }
 
 

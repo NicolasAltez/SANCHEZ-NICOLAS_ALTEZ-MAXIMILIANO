@@ -57,22 +57,21 @@ public class PacienteServiceImpl implements IPacienteService {
     }
 
     @Override
-    public PacienteSalidaDTO actualizarPaciente(PacienteEntradaDTO paciente, Long id) {
+    public PacienteSalidaDTO actualizarPaciente(PacienteEntradaDTO paciente, Long id) throws ResourceNotFoundException {
         Optional<Paciente> pacienteAModificar = pacienteRepository.findById(id);
         if (pacienteAModificar.isPresent()) {
             Paciente pacienteModificado = pacienteRepository.save(modelMapper.map(crearPacienteAModificar(paciente,pacienteAModificar.get()), Paciente.class));
             LOGGER.info("Paciente modificado: {}", pacienteModificado);
             return modelMapper.map(pacienteModificado, PacienteSalidaDTO.class);
         } else {
-            LOGGER.info("No se encontró el paciente a modificar con  el dni : {}", paciente.getDni());
-            return null;
+            throw new ResourceNotFoundException("No se encontró el paciente a actualizar con id: " + id);
         }
     }
 
     @Override
     public void eliminarPaciente(Long id) throws ResourceNotFoundException {
         if (!pacienteRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No se encontró el paciente con id: " + id);
+            throw new ResourceNotFoundException("No se encontró el paciente a eliminar con id: " + id);
         }
         pacienteRepository.deleteById(id);
         LOGGER.info("Paciente eliminado con id: {}", id);

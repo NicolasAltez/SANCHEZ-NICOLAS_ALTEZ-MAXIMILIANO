@@ -1,11 +1,14 @@
 package com.backend.integrador.controller;
 
 import com.backend.integrador.dto.domicilio.DomicilioSalidaDTO;
+import com.backend.integrador.dto.odontologo.OdontologoEntradaDTO;
 import com.backend.integrador.dto.odontologo.OdontologoSalidaDTO;
+import com.backend.integrador.dto.paciente.PacienteEntradaDTO;
 import com.backend.integrador.dto.paciente.PacienteSalidaDTO;
 import com.backend.integrador.dto.turno.TurnoEntradaDTO;
 import com.backend.integrador.dto.turno.TurnoSalidaDTO;
 import com.backend.integrador.exception.BadRequestException;
+import com.backend.integrador.exception.ResourceNotFoundException;
 import com.backend.integrador.service.IOdontologoService;
 import com.backend.integrador.service.IPacienteService;
 import com.backend.integrador.service.ITurnoService;
@@ -34,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -174,26 +178,26 @@ class TurnoControllerTest {
         @Test
         void dadoPacienteInvalido_CuandoRegistrarTurno_EntoncesRetornarBadRequest() throws Exception {
 
+
             TurnoEntradaDTO turnoACrear = TurnoEntradaDTO.builder()
-                    .pacienteId(400L)
+                    .pacienteId(1L)
                     .odontologoId(1L)
                     .fechaYHora(LocalDateTime.now().plusDays(1))
                     .build();
 
-            when(pacienteService.buscarPacientePorId(400L)).thenReturn(null);
-            when(odontologoService.buscarOdontologoPorId(1L)).thenReturn(OdontologoSalidaDTO.builder().build());
-            when(turnoService.registrarTurno(turnoACrear)).thenThrow(BadRequestException.class);
+
+            doAnswer(invocation -> {
+                throw new BadRequestException("El paciente no existe");
+            }).when(turnoService).registrarTurno(any(TurnoEntradaDTO.class));
 
             ResultActions respuesta = mockMvc.perform(post("/turnos").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(turnoACrear)));
 
             respuesta.andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.timestamp").exists())
-                    .andExpect(jsonPath("$.message").value("El paciente no existe"))
+                    .andExpect(jsonPath("$.mensaje").value("El paciente no existe"))
                     .andExpect(jsonPath("$.status").value("BAD_REQUEST"));
 
-            verify(turnoService, times(1)).registrarTurno(turnoACrear);
-            verify(pacienteService, times(1)).buscarPacientePorId(400L);
-            verify(odontologoService, times(1)).buscarOdontologoPorId(1L);
+            verify(turnoService, times(1)).registrarTurno(any(TurnoEntradaDTO.class));
         }
 
         @Test
@@ -205,21 +209,43 @@ class TurnoControllerTest {
                     .fechaYHora(LocalDateTime.now().plusDays(1))
                     .build();
 
-            when(pacienteService.buscarPacientePorId(1L)).thenReturn(PacienteSalidaDTO.builder().build());
-            when(odontologoService.buscarOdontologoPorId(1L)).thenReturn(null);
-            when(turnoService.registrarTurno(turnoACrear)).thenThrow(BadRequestException.class);
+            doAnswer(invocation -> {
+                throw new BadRequestException("El Odontologo no existe");
+            }).when(turnoService).registrarTurno(any(TurnoEntradaDTO.class));
 
             ResultActions respuesta = mockMvc.perform(post("/turnos").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(turnoACrear)));
 
             respuesta.andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.timestamp").exists())
-                    .andExpect(jsonPath("$.message").value("El odontologo no existe"))
+                    .andExpect(jsonPath("$.mensaje").value("El Odontologo no existe"))
                     .andExpect(jsonPath("$.status").value("BAD_REQUEST"));
 
-            verify(turnoService, times(1)).registrarTurno(turnoACrear);
-            verify(pacienteService, times(1)).buscarPacientePorId(1L);
-            verify(odontologoService, times(1)).buscarOdontologoPorId(1L);
+            verify(turnoService, times(1)).registrarTurno(any(TurnoEntradaDTO.class));
         }
+
+        @Test
+        void dadoPacienteYOdontologoInvalido_cuandoRegistrarTurno_EntoncesRetornarBadRequest() throws Exception {
+
+            TurnoEntradaDTO turnoACrear = TurnoEntradaDTO.builder()
+                    .pacienteId(1L)
+                    .odontologoId(1L)
+                    .fechaYHora(LocalDateTime.now().plusDays(1))
+                    .build();
+
+            doAnswer(invocation -> {
+                throw new BadRequestException("El odontologo y el paciente no existen");
+            }).when(turnoService).registrarTurno(any(TurnoEntradaDTO.class));
+
+            ResultActions respuesta = mockMvc.perform(post("/turnos").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(turnoACrear)));
+
+            respuesta.andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.timestamp").exists())
+                    .andExpect(jsonPath("$.mensaje").value("El odontologo y el paciente no existen"))
+                    .andExpect(jsonPath("$.status").value("BAD_REQUEST"));
+
+            verify(turnoService, times(1)).registrarTurno(any(TurnoEntradaDTO.class));
+        }
+
     }
 
     @Nested
@@ -393,9 +419,7 @@ class TurnoControllerTest {
                     .paciente(pacienteSalidaDTO)
                     .build();
 
-            when(turnoService.actualizarTurno(turnoActualizado, 1L)).thenReturn(turnoSalida);
-            when(pacienteService.buscarPacientePorId(1L)).thenReturn(pacienteSalidaDTO);
-            when(odontologoService.buscarOdontologoPorId(1L)).thenReturn(odontologoSalidaDTO);
+            when(turnoService.actualizarTurno(any(TurnoEntradaDTO.class), eq(1L))).thenReturn(turnoSalida);
 
             ResultActions respuesta = mockMvc.perform(put("/turnos/1").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(turnoActualizado)));
 
@@ -415,9 +439,28 @@ class TurnoControllerTest {
                     .andExpect(jsonPath("$.paciente.domicilioSalidaDTO.provincia").value(turnoSalida.getPaciente().getDomicilioSalidaDTO().getProvincia()))
                     .andExpect(jsonPath("$.paciente.domicilioSalidaDTO.localidad").value(turnoSalida.getPaciente().getDomicilioSalidaDTO().getLocalidad()));
 
-            verify(turnoService, times(1)).actualizarTurno(turnoActualizado, 1L);
-            verify(pacienteService, times(1)).buscarPacientePorId(1L);
-            verify(odontologoService, times(1)).buscarOdontologoPorId(1L);
+            verify(turnoService, times(1)).actualizarTurno(any(TurnoEntradaDTO.class), eq(1L));
+        }
+        @Test
+        void dadoTurnoInexistente_CuandoActualizarTurno_EntoncesRetornarNotFound() throws Exception {
+            doAnswer(invocation -> {
+                throw new ResourceNotFoundException("No se encontró el turno a actualizar con id: " + invocation.getArgument(1));
+            }).when(turnoService).actualizarTurno(any(TurnoEntradaDTO.class), eq(1L));
+
+            ResultActions respuesta = mockMvc.perform(put("/turnos/1")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(TurnoEntradaDTO.builder()
+                                    .fechaYHora(LocalDateTime.now().plusDays(1))
+                                    .odontologoId(1L)
+                                    .pacienteId(1L)
+                            .build())));
+            respuesta.andDo(print());
+            respuesta.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.mensaje").value("No se encontró el turno a actualizar con id: 1"))
+                    .andExpect(jsonPath("$.timestamp").exists())
+                    .andExpect(jsonPath("$.status").value("NOT_FOUND"));
+
+            verify(turnoService, times(1)).actualizarTurno(any(TurnoEntradaDTO.class), eq(1L));
         }
     }
 
