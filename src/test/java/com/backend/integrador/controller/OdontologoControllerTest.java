@@ -91,7 +91,6 @@ class OdontologoControllerTest {
             ResultActions respuesta = mockMvc.perform(get("/odontologos"));
 
             respuesta.andExpect(status().isOk()).andExpect(content().string("[]")).andExpect(jsonPath("$",hasSize(0)));
-            ;
 
             verify(odontologoService, times(1)).buscarTodosLosOdontologos();
         }

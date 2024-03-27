@@ -7,7 +7,6 @@ import com.backend.integrador.entity.Odontologo;
 import com.backend.integrador.exception.ResourceNotFoundException;
 import com.backend.integrador.repository.OdontologoRepository;
 import com.backend.integrador.service.IOdontologoService;
-import com.backend.integrador.utils.JsonPrinter;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

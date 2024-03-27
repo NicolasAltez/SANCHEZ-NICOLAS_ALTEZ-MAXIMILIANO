@@ -1,14 +1,12 @@
-$(document).ready(()=>{
-    const listarOdontologos = () =>{
-        $.ajax({
-            url: "http://localhost:8080/odontologos",
-            type: "GET",
-            dataType: "json",
-            success: function(res){
+document.addEventListener('DOMContentLoaded', () => {
+    const listarOdontologos = () => {
+        fetch("http://localhost:8080/odontologos")
+            .then(response => response.json())
+            .then(res => {
                 let data = '';
-                res.forEach(element =>{
-                    data+=`
-                    <tr odontologoId = ${element.id}>
+                res.forEach(element => {
+                    data += `
+                    <tr odontologoId=${element.id}>
                         <td>${element.id}</td>
                         <td>${element.numeroDeMatricula}</td>
                         <td>${element.nombre}</td>
@@ -19,148 +17,174 @@ $(document).ready(()=>{
                         <td>
                             <button id="btn-eliminar-odontologo" class="btn btn-danger">Eliminar</button>
                         </td>
-
                         <td>
                             <button id="btn-actualizar-odontologo" class="btn btn-primary">Actualizar</button>
                         </td>
                     </tr>
-                    `
+                    `;
                 });
-    
-                $('#tbody-odontologos').html(data);
-            }
-        });
-    }
-    const guardarOdontologo = () =>{
-        $('#guardarOdontologo').on('click',function(){
-            const odontologo = {
-                numeroDeMatricula: $('#numeroDeMatricula').val(),
-                nombre: $('#nombre').val(),
-                apellido: $('#apellido').val()
-            }
 
-            $.ajax({
-                
-                url: "http://localhost:8080/odontologos",
-                contentType: "application/json",
-                type: "POST",
-                data: JSON.stringify(odontologo),
-                dataType: "json",
-                success: (data) => {
-                    $('#mensajes-odontologos').html('Odontologo guardado').css('display','block')
-                    listarOdontologos();
-                    limpiarFormulario();
-                    console.log("Odontologo guardado");
+                document.getElementById('tbody-odontologos').innerHTML = data;
+            })
+            .catch(error => console.error('Error:', error));
+    };
+
+    const guardarOdontologo = () => {
+        document.getElementById('guardarOdontologo').addEventListener('click', () => {
+            const odontologo = {
+                numeroDeMatricula: document.getElementById('numeroDeMatricula').value,
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value
+            };
+    
+            fetch("http://localhost:8080/odontologos", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(odontologo),
+            })
+            .then(async response => {
+                if (response.status === 201) {
+                    document.getElementById('mensajes-odontologos').innerHTML = 'Odontologo guardado';
+                    document.getElementById('mensajes-odontologos').classList.remove('alert-danger');
+                    document.getElementById('mensajes-odontologos').classList.add('alert-success');
+                    document.getElementById('mensajes-odontologos').style.display = 'block';
+                    return response.json();
+                } else {
+                    const errorData = await response.json();
+                    let errorMessage = errorData.message;
+                    if (errorData.errores) {
+                        errorMessage += '<ul>';
+                        errorData.errores.forEach(err => {
+                            errorMessage += `<li>${err}</li>`;
+                        });
+                        errorMessage += '</ul>';
+                    }
+                    document.getElementById('mensajes-odontologos').innerHTML = errorMessage;
+                    document.getElementById('mensajes-odontologos').classList.remove('alert-success');
+                    document.getElementById('mensajes-odontologos').classList.add('alert-danger');
+                    document.getElementById('mensajes-odontologos').style.display = 'block';
+                    throw new Error(errorData.message);
                 }
+            })
+            .then(data => {
+                listarOdontologos();
+                limpiarFormulario();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+               
             });
-        })
-    }
+        });
+    };
+    
+    
 
     const detalleOdontologo = () => {
-        $(document).on('click', '#btn-detalle-odontologo', function() {
-            let btnDetalleOdontologo = $(this)[0].parentElement.parentElement;
-            let id = $(btnDetalleOdontologo).attr('odontologoId');
-            $.ajax({
-                url: `http://localhost:8080/odontologos/${id}`,
-                type: "GET",
-                dataType: "json",
-                success: function(response) {
-                    let detalleTurnoHtml = `
-                        <p><strong>Detalle del odontologo con ID:</strong> ${response.id}</p>
-                        <p><strong>Numero De Matricula:</strong> ${response.numeroDeMatricula}</p>
-                        <p><strong>Nombre:</strong> ${response.nombre}</p>
-                        <p><strong>Apellido:</strong> ${response.apellido}</p>
-                    `;
-                    $("#detalleOdontologo").html(detalleTurnoHtml);
-                    $("#modalDetalleOdontologo").modal("show");
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error al obtener detalles del odonotologo:", error);
-                }
-            });
+        document.addEventListener('click', event => {
+            if (event.target && event.target.id === 'btn-detalle-odontologo') {
+                let btnDetalleOdontologo = event.target.parentElement.parentElement;
+                let id = btnDetalleOdontologo.getAttribute('odontologoId');
+                fetch(`http://localhost:8080/odontologos/${id}`)
+                    .then(response => response.json())
+                    .then(response => {
+                        let detalleOdontologoHtml = `
+                            <p><strong>Detalle del odontologo con ID:</strong> ${response.id}</p>
+                            <p><strong>Numero De Matricula:</strong> ${response.numeroDeMatricula}</p>
+                            <p><strong>Nombre:</strong> ${response.nombre}</p>
+                            <p><strong>Apellido:</strong> ${response.apellido}</p>
+                        `;
+                        $("#detalleOdontologo").html(detalleOdontologoHtml);
+                        $("#modalDetalleOdontologo").modal("show");
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
         });
     };
 
     const eliminarOdontologo = () => {
-        $(document).on('click','#btn-eliminar-odontologo',function(){
-            if(confirm('¿Estas seguro de eliminar el odontologo?')){
-                let btnEliminarOdontologo = $(this)[0].parentElement.parentElement;
-                let id = $(btnEliminarOdontologo).attr('odontologoId');
-                $.ajax({
-                    url: `http://localhost:8080/odontologos/${id}`,
-                    type: "DELETE",
-                    dataType: "json",
-                    success: (res) => {
-                        $('#mensajes-odontologos').html('Odontologo eliminado').css('display','block')
+        document.addEventListener('click', event => {
+            if (event.target && event.target.id === 'btn-eliminar-odontologo') {
+                if (confirm('¿Estás seguro de eliminar el odontólogo?')) {
+                    let btnEliminarOdontologo = event.target.parentElement.parentElement;
+                    let id = btnEliminarOdontologo.getAttribute('odontologoId');
+                    fetch(`http://localhost:8080/odontologos/${id}`, {
+                        method: 'DELETE',
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al eliminar el odontólogo');
+                        }
+                        document.getElementById('mensajes-odontologos').innerHTML = 'Odontólogo eliminado';
+                        document.getElementById('mensajes-odontologos').style.display = 'block';
                         listarOdontologos();
-                    }
-                })
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
             }
-
-            
-        })
-    }
+        });
+    };
+    
 
     const llenarDatosOdontologo = () => {
-        $(document).on('click','#btn-actualizar-odontologo',function(){
-            let btnEditar = $(this)[0].parentElement.parentElement;
-            let id = $(btnEditar).attr('odontologoId');
-            $('#guardarOdontologo').hide();
-            $('#actualizarOdontologo').show();
+        document.addEventListener('click', event => {
+            if (event.target && event.target.id === 'btn-actualizar-odontologo') {
+                let btnEditar = event.target.parentElement.parentElement;
+                let id = btnEditar.getAttribute('odontologoId');
+                document.getElementById('guardarOdontologo').style.display = 'none';
+                document.getElementById('actualizarOdontologo').style.display = 'block';
 
-            $.ajax({
-                url: `http://localhost:8080/odontologos/${id}`,
-                type: "GET",
-                dataType: "json",
-                success: (res) => {
-                    $('#idOdontologo').val(res.id);
-                    $('#numeroDeMatricula').val(res.numeroDeMatricula);
-                    $('#nombre').val(res.nombre);
-                    $('#apellido').val(res.apellido);
-                }
-            })
-    })
-    }
+                fetch(`http://localhost:8080/odontologos/${id}`)
+                    .then(response => response.json())
+                    .then(res => {
+                        document.getElementById('idOdontologo').value = res.id;
+                        document.getElementById('numeroDeMatricula').value = res.numeroDeMatricula;
+                        document.getElementById('nombre').value = res.nombre;
+                        document.getElementById('apellido').value = res.apellido;
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+    };
 
     const actualizarOdontologo = () => {
-        $('#actualizarOdontologo').on('click',function(){
-            let id = $('#idOdontologo').val();            
-            $('#guardarOdontologo').css('display','none');
-            $('#actualizarOdontologo').css('display','block');
-            
-           
+        document.getElementById('actualizarOdontologo').addEventListener('click', () => {
+            let id = document.getElementById('idOdontologo').value;
+            document.getElementById('guardarOdontologo').style.display = 'none';
+            document.getElementById('actualizarOdontologo').style.display = 'block';
+
             const odontologoAModificar = {
-                numeroDeMatricula: $('#numeroDeMatricula').val(),
-                nombre: $('#nombre').val(),
-                apellido: $('#apellido').val()
-            }
-            console.log(id);
+                numeroDeMatricula: document.getElementById('numeroDeMatricula').value,
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value
+            };
 
-            $.ajax({
-                url: `http://localhost:8080/odontologos/${id}`,
-                contentType: "application/json",
-                type: "PUT",
-                data: JSON.stringify(odontologoAModificar),
-                dataType: "json",
-                success: (res) => {
-                    $('#mensajes-odontologos').html('Odontologo actualizado').css('display','block');
-                    $('#actualizarOdontologo').css('display','none');
-                    $('#guardarOdontologo').css('display','block');
-                    limpiarFormulario();
-                    listarOdontologos();
-                }
-
+            fetch(`http://localhost:8080/odontologos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(odontologoAModificar),
             })
-        })
+            .then(response => response.json())
+            .then(res => {
+                document.getElementById('mensajes-odontologos').innerHTML = 'Odontologo actualizado';
+                document.getElementById('mensajes-odontologos').style.display = 'block';
+                document.getElementById('actualizarOdontologo').style.display = 'none';
+                document.getElementById('guardarOdontologo').style.display = 'block';
+                limpiarFormulario();
+                listarOdontologos();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    };
 
-    }
-
-
-    const limpiarFormulario = () =>{
-        $('#numeroDeMatricula').val('');
-        $('#nombre').val('');
-        $('#apellido').val('');
-    }
+    const limpiarFormulario = () => {
+        document.getElementById('numeroDeMatricula').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('apellido').value = '';
+    };
 
     listarOdontologos();
     guardarOdontologo();
@@ -168,5 +192,4 @@ $(document).ready(()=>{
     eliminarOdontologo();
     llenarDatosOdontologo();
     actualizarOdontologo();
-
-})
+});

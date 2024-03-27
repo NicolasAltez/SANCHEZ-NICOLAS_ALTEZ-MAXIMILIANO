@@ -1,15 +1,13 @@
-$(document).ready(()=>{
-    const listarPacientes = () =>{
-        $.ajax({
-            url: "http://localhost:8080/pacientes",
-            type: "GET",
-            dataType: "json",
-            success: function(res){
-                console.log(res);
-                let data = '';
-                res.forEach(element =>{
-                    data+=`
-                    <tr pacienteId = ${element.id}>
+document.addEventListener("DOMContentLoaded", () => {
+  const listarPacientes = () => {
+    fetch("http://localhost:8080/pacientes")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        let tableData = "";
+        data.forEach((element) => {
+          tableData += `
+                    <tr pacienteId="${element.id}">
                         <td>${element.id}</td>
                         <td>${element.nombre}</td>
                         <td>${element.apellido}</td>
@@ -20,186 +18,215 @@ $(document).ready(()=>{
                         <td>${element.domicilioSalidaDTO.localidad}</td>
                         <td>${element.domicilioSalidaDTO.provincia}</td>
                         <td>
-                            <button id="btn-detalle-pacietne" class="btn btn-warning">Detalle</button>
+                            <button class="btn btn-warning btn-detalle-paciente">Detalle</button>
                         </td>
                         <td>
-                            <button id="btn-eliminar-paciente" class="btn btn-danger">Eliminar</button>
+                            <button class="btn btn-danger btn-eliminar-paciente">Eliminar</button>
                         </td>
-
                         <td>
-                            <button id="btn-actualizar-odontologo" class="btn btn-primary">Actualizar</button>
+                            <button class="btn btn-primary btn-actualizar-paciente">Actualizar</button>
                         </td>
-                    </tr>
-                    `
-                });
-
-                $('#tbody-pacientes').html(data);
-            }
+                    </tr>`;
         });
-    }
-    const guardarPaciente = () =>{
-        $('#guardarPaciente').on('click',function(){
-            const paciente = {
-                nombre: $('#nombre').val(),
-                apellido: $('#apellido').val(),
-                dni: $('#dni').val(),
-                fechaIngreso: $('#fechaIngreso').val(),
-                domicilioEntradaDTO: {
-                    calle: $('#calle').val(),
-                    numero: $('#numero').val(),
-                    localidad: $('#localidad').val(),
-                    provincia: $('#provincia').val()
-                }
-            }
-            console.log(`este es el paciente ${paciente}`);
+        document.getElementById("tbody-pacientes").innerHTML = tableData;
+      })
+      .catch((error) => console.error("Error:", error));
+  };
 
-            $.ajax({
+  const guardarPaciente = () => {
+    document.getElementById("guardarPaciente").addEventListener("click", () => {
+      const paciente = {
+        nombre: document.getElementById("nombre").value,
+        apellido: document.getElementById("apellido").value,
+        dni: document.getElementById("dni").value,
+        fechaIngreso: document.getElementById("fechaIngreso").value,
+        domicilioEntradaDTO: {
+          calle: document.getElementById("calle").value,
+          numero: document.getElementById("numero").value,
+          localidad: document.getElementById("localidad").value,
+          provincia: document.getElementById("provincia").value,
+        },
+      };
 
-                url: "http://localhost:8080/pacientes",
-                contentType: "application/json",
-                type: "POST",
-                data: JSON.stringify(paciente),
-                dataType: "json",
-                success: (data) => {
-                    $('#mensajes-pacientes').html('Paciente guardado').css('display','block')
-                    listarPacientes();
-                    limpiarFormulario();
-                    console.log("Paciente guardado");
-                }
+      fetch("http://localhost:8080/pacientes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paciente),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error al guardar el paciente");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          document.getElementById("mensajes-pacientes").textContent =
+            "Paciente guardado";
+          document.getElementById("mensajes-pacientes").style.display = "block";
+          listarPacientes();
+          limpiarFormulario();
+          console.log("Paciente guardado:", data);
+        })
+        .catch((error) => console.error("Error:", error));
+    });
+  };
+
+  const detallePaciente = () => {
+    document.addEventListener("click", (event) => {
+      if (
+        event.target &&
+        event.target.classList.contains("btn-detalle-paciente")
+      ) {
+        let btnDetallePaciente = event.target.parentElement.parentElement;
+        let id = btnDetallePaciente.getAttribute("pacienteId");
+        fetch(`http://localhost:8080/pacientes/${id}`)
+          .then((response) => response.json())
+          .then((response) => {
+            let detallePaciente = `
+                            <p><strong>Detalle del paciente con ID:</strong> ${response.id}</p>
+                            <p><strong>Nombre:</strong> ${response.nombre}</p>
+                            <p><strong>Apellido:</strong> ${response.apellido}</p>
+                            <p><strong>Dni:</strong> ${response.dni}</p>
+                            <p><strong>Fecha De Ingreso:</strong> ${response.fechaIngreso}</p>
+                            <p><strong>Calle:</strong> ${response.domicilioSalidaDTO.calle}</p>
+                            <p><strong>Numero:</strong> ${response.domicilioSalidaDTO.numero}</p>
+                            <p><strong>Localidad:</strong> ${response.domicilioSalidaDTO.localidad}</p>
+                            <p><strong>Provincia:</strong> ${response.domicilioSalidaDTO.provincia}</p>
+                        `;
+            $("#detallePaciente").html(detallePaciente);
+            $("#modalDetallePaciente").modal("show");
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    });
+  };
+
+
+  const eliminarPaciente = () => {
+    document.addEventListener("click", async (event) => {
+      if (
+        event.target &&
+        event.target.classList.contains("btn-eliminar-paciente")
+      ) {
+        if (confirm("¿Estás seguro de eliminar el paciente?")) {
+          let id = event.target.closest("tr").getAttribute("pacienteId");
+          try {
+            const response = await fetch(`http://localhost:8080/pacientes/${id}`, {
+              method: "DELETE",
             });
-        })
-    }
 
-    const detallePaciente = () =>{
-        $(document).on('click','#btn-detalle-paciente',function(){
-            let btnDetallePaciente = $(this)[0].parentElement.parentElement;
-            let id = $(btnDetallePaciente).attr('pacienteId');
-            $.ajax({
-                url: `http://localhost:8080/paciente/${id}`,
-                type: "GET",
-                dataType: "json",
-                success: (res) => {
-                    let data = `
-                    <strong>Nombre:</strong> ${res.nombre} - <strong>Apellido:</strong> ${res.apellido} - <strong>Dni:</strong> ${res.dni} - <strong>FechaIngreso:</strong> ${res.fechaIngreso} - <strong>Calle:</strong> ${res.calle} - <strong>Numero:</strong> ${res.numero} - <strong>Localidad:</strong> ${res.localidad} - <strong>Provincia:</strong> ${res.provincia} <br><br> // ver----------------------
-                    <button id="btn-limpiar" class="btn btn-warning">Limpiar</button>
-                    `
-                    let paciente = $('#paciente-detalle').html(data);
-                    $('#btn-limpiar').on('click', () =>{
-                        paciente.html('');
-                    })
-                }
-            })
-        })
-    }
-
-    const eliminarPaciente = () => {
-        $(document).on('click','#btn-eliminar-paciente',function(){
-            if(confirm('¿Estas seguro de eliminar el paciente?')){
-                let btnEliminarPaciente = $(this)[0].parentElement.parentElement;
-                let id = $(btnEliminarPaciente).attr('pacienteId');
-                $.ajax({
-                    url: `http://localhost:8080/pacientes/${id}`,
-                    type: "DELETE",
-                    dataType: "json",
-                    success: (res) => {
-                        $('#mensajes-pacientes').html('Paciente eliminado').css('display','block')
-                        listarPacientes();
-                    }
-                })
+            if (!response.ok) {
+              throw new Error("Error al eliminar el paciente");
             }
+            document.getElementById("mensajes-pacientes").textContent =
+              "Paciente eliminado correctamente";
+            document.getElementById("mensajes-pacientes").style.display =
+              "block";
+            listarPacientes();
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        }
+      }
+    });
+  };
 
 
+  const llenarDatosPaciente = () => {
+    document.addEventListener("click", (event) => {
+      if (
+        event.target &&
+        event.target.classList.contains("btn-actualizar-paciente")
+      ) {
+        let id = event.target.closest("tr").getAttribute("pacienteId");
+        fetch(`http://localhost:8080/pacientes/${id}`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("nombre").value = data.nombre;
+            document.getElementById("apellido").value = data.apellido;
+            document.getElementById("dni").value = data.dni;
+            document.getElementById("fechaIngreso").value = data.fechaIngreso;
+            document.getElementById("calle").value = data.domicilioSalidaDTO.calle;
+            document.getElementById("numero").value = data.domicilioSalidaDTO.numero;
+            document.getElementById("localidad").value = data.domicilioSalidaDTO.localidad;
+            document.getElementById("provincia").value = data.domicilioSalidaDTO.provincia;
+            document.getElementById("idPaciente").value = id;
+            document.getElementById("guardarPaciente").style.display = "none";
+            document.getElementById("actualizarPaciente").style.display =
+              "block";
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    });
+  };
+
+  const actualizarPaciente = () => {
+    document
+      .getElementById("actualizarPaciente")
+      .addEventListener("click", () => {
+        let id = document.getElementById("idPaciente").value;
+
+        const domicilioAModificar = {
+          calle: document.getElementById("calle").value,
+          numero: document.getElementById("numero").value,
+          localidad: document.getElementById("localidad").value,
+          provincia: document.getElementById("provincia").value,
+        };
+
+        const pacienteAModificar = {
+          nombre: document.getElementById("nombre").value,
+          apellido: document.getElementById("apellido").value,
+          dni: document.getElementById("dni").value,
+          fechaIngreso: document.getElementById("fechaIngreso").value,
+          domicilioEntradaDTO: domicilioAModificar,
+        };
+        console.log(pacienteAModificar);
+        fetch(`http://localhost:8080/pacientes/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(pacienteAModificar),
         })
-    }
-
-    const llenarDatosPaciente = () => {
-        $(document).on('click','#btn-actualizar-paciente',function(){
-            let btnEditar = $(this)[0].parentElement.parentElement;
-            let id = $(btnEditar).attr('pacienteId');
-            $('#guardarPaciente').hide();
-            $('#actualizarPaciente').show();
-
-            $.ajax({
-                url: `http://localhost:8080/pacientes/${id}`,
-                type: "GET",
-                dataType: "json",
-                success: (res) => {
-                    $('#nombre').val(res.nombre);
-                    $('#apellido').val(res.apellido);
-                    $('#dni').val(res.dni);
-                    $('#fechaIngreso').val(res.fechaIngreso);
-                    $('#calle').val(res.calle);
-                    $('#numero').val(res.numero);
-                    $('#localidad').val(res.localidad);
-                    $('#provincia').val(res.provincia);
-                }
-            })
-    })
-    }
-
-    const actualizarPaciente = () => {
-        $('#actualizarPaciente').on('click',function(){
-            let id = $('#idPaciente').val();
-
-            $('#guardarPaciente').css('display','none');
-            $('#actualizarPaciente').css('display','block');
-
-            const domicilioAModificar = {
-                calle: $('#calle').val(),
-                numero: $('#numero').val(),
-                localidad: $('#localidad').val(),
-                provincia: $('#provincia').val()
-
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error al actualizar el paciente");
             }
+            return response.json();
+          })
+          .then((data) => {
+            document.getElementById("mensajes-pacientes").textContent =
+              "Paciente actualizado";
+            document.getElementById("mensajes-pacientes").style.display =
+              "block";
+            document.getElementById("guardarPaciente").style.display = "block";
+            document.getElementById("actualizarPaciente").style.display =
+              "none";
+            limpiarFormulario();
+            listarPacientes();
+            console.log("Paciente actualizado:", data);
+          })
+          .catch((error) => console.error("Error:", error));
+      });
+  };
 
-            const pacienteAModificar = {
-                nombre: $('#nombre').val(),
-                apellido: $('#apellido').val(),
-                dni: $('#dni').val(),
-                fechaIngreso: $('#apellido').val(),
-                domicilio: domicilioAModificar
+  const limpiarFormulario = () => {
+    document.getElementById("nombre").value = "";
+    document.getElementById("apellido").value = "";
+    document.getElementById("dni").value = "";
+    document.getElementById("fechaIngreso").value = "";
+    document.getElementById("calle").value = "";
+    document.getElementById("numero").value = "";
+    document.getElementById("localidad").value = "";
+    document.getElementById("provincia").value = "";
+  };
 
-
-            }
-            console.log(pacienteAModificar)
-            console.log(id);
-
-            $.ajax({
-                url: `http://localhost:8080/pacientes/actualizar/${id}`,
-                contentType: "application/json",
-                type: "PUT",
-                data: JSON.stringify(pacienteAModificar),
-                dataType: "json",
-                success: (res) => {
-                    $('#mensajes-pacientes').html('Paciente actualizado').css('display','block');
-                    $('#actualizarPaciente').css('display','none');
-                    $('#guardarPaciente').css('display','block');
-                    limpiarFormulario();
-                    listarPacientes();
-                }
-
-            })
-        })
-
-    }
-
-
-    const limpiarFormulario = () =>{
-        $('#nombre').val('');
-        $('#apellido').val('');
-        $('#dni').val('');
-        $('#fechaIngreso').val('');
-        $('#calle').val('');
-        $('#numero').val('');
-        $('#localidad').val('');
-        $('#provincia').val('');
-    }
-
-    listarPacientes();
-    guardarPaciente();
-    detallePaciente();
-    eliminarPaciente();
-    llenarDatosPaciente();
-    actualizarPaciente();
-
-})
+  listarPacientes();
+  guardarPaciente();
+  detallePaciente();
+  eliminarPaciente();
+  llenarDatosPaciente();
+  actualizarPaciente();
+});
