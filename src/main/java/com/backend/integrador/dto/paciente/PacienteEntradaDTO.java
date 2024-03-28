@@ -2,10 +2,10 @@ package com.backend.integrador.dto.paciente;
 
 import com.backend.integrador.dto.domicilio.DomicilioEntradaDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import lombok.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 
