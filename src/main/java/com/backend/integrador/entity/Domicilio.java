@@ -1,7 +1,9 @@
 package com.backend.integrador.entity;
 
-import jakarta.persistence.*;
+
 import lombok.*;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "DOMICILIOS")

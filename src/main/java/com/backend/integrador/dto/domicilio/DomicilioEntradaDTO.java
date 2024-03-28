@@ -1,7 +1,10 @@
 package com.backend.integrador.dto.domicilio;
 
-import jakarta.validation.constraints.*;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import javax.validation.constraints.*;
 
 @AllArgsConstructor
 @NoArgsConstructor

@@ -1,8 +1,12 @@
 package com.backend.integrador.dto.odontologo;
 
 
-import jakarta.validation.constraints.*;
+
 import lombok.*;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 @NoArgsConstructor
